@@ -1,0 +1,65 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "DAQ_DLL_Test/1.0.0": {
+        "dependencies": {
+          "DelsysNICommon": "1.0.0"
+        },
+        "runtime": {
+          "DAQ_DLL_Test.dll": {}
+        }
+      },
+      "DelsysNICommon/1.0.0": {
+        "runtime": {
+          "DelsysNICommon.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "NationalInstruments.DAQmx/24.8.45.49494": {
+        "runtime": {
+          "NationalInstruments.DAQmx.dll": {
+            "assemblyVersion": "24.8.45.49494",
+            "fileVersion": "24.8.45.49494"
+          }
+        }
+      },
+      "NationalInstruments.Common/19.1.40.49152": {
+        "runtime": {
+          "NationalInstruments.Common.dll": {
+            "assemblyVersion": "19.1.40.49152",
+            "fileVersion": "19.1.40.49152"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "DAQ_DLL_Test/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "DelsysNICommon/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "NationalInstruments.DAQmx/24.8.45.49494": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "NationalInstruments.Common/19.1.40.49152": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

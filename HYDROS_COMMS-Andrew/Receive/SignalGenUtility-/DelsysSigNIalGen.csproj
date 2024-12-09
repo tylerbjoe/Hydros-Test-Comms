@@ -1,0 +1,70 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <PackageIcon>icon.jpg</PackageIcon>
+    <ApplicationIcon>db3cb776-1e44-483f-bb01-d772257d98da.ico</ApplicationIcon>
+    <UseWindowsForms>False</UseWindowsForms>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Sub-Repos\**" />
+    <EmbeddedResource Remove="Sub-Repos\**" />
+    <None Remove="Sub-Repos\**" />
+    <Page Remove="Sub-Repos\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="README.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="db3cb776-1e44-483f-bb01-d772257d98da.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="icon.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="README.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.2.2" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="Delsys.Plotter" Version="2.0.0.623-dev-2.0.0-UIOverhaul" />
+    <PackageReference Include="DelsysAPI" Version="2.7.0.1239-dev" />
+    <PackageReference Include="MaterialDesignColors" Version="3.1.0-ci598" />
+    <PackageReference Include="MaterialDesignThemes" Version="5.0.1-ci598" />
+    <PackageReference Include="MaterialDesignThemes.MahApps" Version="3.1.0-ci598" />
+    <PackageReference Include="MathNet.Filtering" Version="0.7.0" />
+    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="Sub-Repos\DelsysNICommon\DelsysNICommon\DelsysNICommon.csproj" />
+    <ProjectReference Include="Sub-Repos\Test-DelsysTestFramework\DelsysTestFramework.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="SciChart.Charting3D">
+      <HintPath>..\..\AppData\Local\Programs\SciChart\SciChart SDK\Lib\net6.0-windows\SciChart.Charting3D.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="icon.jpg">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

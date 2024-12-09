@@ -1,0 +1,19 @@
+# This is a configurations file for running pool tests with the popoto modems
+
+# ATTENTION !! TODO : Must be updated for each test
+# file path parameters
+date : 231201 # the date in YYMMDD
+position : "(0,2,0)"
+trial : 0
+
+# chirp path
+chirp_path : "./chirps/231116_15-45kHz_logarithmic.wav"
+
+# transmit strength parameters
+transmit_power : 8    # transmit power for parallel test
+play_scale : 2        # the scaling factor for playing the chirp signal
+
+
+
+
+

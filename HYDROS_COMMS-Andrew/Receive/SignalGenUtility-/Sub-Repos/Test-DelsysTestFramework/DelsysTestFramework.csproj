@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PlatformTarget>x86</PlatformTarget>
+    <Platforms>AnyCPU;x86</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Util\CircularBuffer\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DelsysAPI" Version="2.6.4.1038-Main" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DelsysNICommon\DelsysNICommon\DelsysNICommon.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Ivi.Visa">
+      <HintPath>C:\Users\AThynne\Downloads\Current Projects\HYDROS_COMMS-Andrew\Receive\SignalGenUtility-\Sub-Repos\DelsysNICommon\NI_DLLs\Ni.Visa\Ivi.Visa.dll</HintPath>
+    </Reference>
+    <Reference Include="NationalInstruments.Visa">
+      <HintPath>C:\Users\AThynne\Downloads\Current Projects\HYDROS_COMMS-Andrew\Receive\SignalGenUtility-\Sub-Repos\DelsysNICommon\NI_DLLs\Ni.Visa\NationalInstruments.Visa.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
