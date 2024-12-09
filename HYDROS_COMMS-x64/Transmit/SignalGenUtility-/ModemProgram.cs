@@ -64,7 +64,7 @@ namespace DelsysSigNIalGen
             //}
 
             // Add to log
-            using (StreamWriter sw = new StreamWriter($"C:\\Users\\AEngel.DELSYS\\Documents\\outputLogs\\outputLog_{trialNum}.txt", true))
+            using (StreamWriter sw = new StreamWriter($"C:\\Users\\TJoe\\Documents\\outputLogs\\outputLog_{trialNum}.txt", true))
             {
                 sw.WriteLine(response);
             }
@@ -219,7 +219,7 @@ namespace DelsysSigNIalGen
         // Should decode the values [60, 95]
         public static void sendCSV(NetworkStream stream, NetworkStream pcmStream, int calls)
         {
-            string filePath = $"U:\\Users Common\\AnnaE\\csvsUW\\DownOut_RT_0.csv"; 
+            string filePath = $"U:\\Users Common\\TJoe\\csvsUW\\DownOut_RT_0.csv"; 
             List<float> floatList = new List<float>();
 
             // Read the CSV file
