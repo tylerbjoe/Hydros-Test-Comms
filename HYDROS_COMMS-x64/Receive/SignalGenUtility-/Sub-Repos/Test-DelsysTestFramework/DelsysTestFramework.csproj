@@ -1,10 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
 
@@ -22,10 +22,10 @@
 
   <ItemGroup>
     <Reference Include="Ivi.Visa">
-      <HintPath>C:\Users\AThynne\Downloads\Current Projects\HYDROS_COMMS-Andrew\Receive\SignalGenUtility-\Sub-Repos\DelsysNICommon\NI_DLLs\Ni.Visa\Ivi.Visa.dll</HintPath>
+      <HintPath>..\DelsysNICommon\NI_DLLs\Ni.Visa\Ivi.Visa.dll</HintPath>
     </Reference>
     <Reference Include="NationalInstruments.Visa">
-      <HintPath>C:\Users\AThynne\Downloads\Current Projects\HYDROS_COMMS-Andrew\Receive\SignalGenUtility-\Sub-Repos\DelsysNICommon\NI_DLLs\Ni.Visa\NationalInstruments.Visa.dll</HintPath>
+      <HintPath>..\DelsysNICommon\NI_DLLs\Ni.Visa\NationalInstruments.Visa.dll</HintPath>
     </Reference>
   </ItemGroup>
 

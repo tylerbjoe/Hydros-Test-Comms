@@ -62,7 +62,7 @@ partial class MainViewModel : ObservableObject
         AOSampleRate = 1_000_000; // 1MHz
         AnalogInRange = "± 5 V"; // You can still toggle in app
 
-        //int a = fftDLLLayer.fftwFunc(); // for testing dll layer
+        int a = fftDLLLayer.fftwFunc(); // for testing dll layer
 
         // Init Modem -- below is done to be super super sure we don't make two instances of our socket connections
         if (modemInitialized == false)

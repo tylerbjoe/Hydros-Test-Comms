@@ -9,7 +9,8 @@
     <PackageIcon>icon.jpg</PackageIcon>
     <ApplicationIcon>db3cb776-1e44-483f-bb01-d772257d98da.ico</ApplicationIcon>
     <UseWindowsForms>False</UseWindowsForms>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -50,6 +51,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FFTProj\FFTProj.vcxproj" />
     <ProjectReference Include="Sub-Repos\DelsysNICommon\DelsysNICommon\DelsysNICommon.csproj" />
     <ProjectReference Include="Sub-Repos\Test-DelsysTestFramework\DelsysTestFramework.csproj" />
   </ItemGroup>

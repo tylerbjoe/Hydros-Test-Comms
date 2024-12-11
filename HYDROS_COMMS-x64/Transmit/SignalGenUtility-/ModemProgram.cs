@@ -24,6 +24,7 @@ using static System.Net.Mime.MediaTypeNames;
 using DelsysSigNIalGen.ViewModel;
 using MathNet.Filtering.Butterworth;
 using static qxz;
+using System.Collections;
 
 namespace DelsysSigNIalGen
 {
@@ -343,22 +344,22 @@ namespace DelsysSigNIalGen
 
                             if (values.Length == 2 && int.TryParse(values[0], out hr) && int.TryParse(values[1], out spo2))
                             {
-                                //Trace.WriteLine($"Algorithm Vals: {hr}, {spo2}");
+                                Trace.WriteLine($"Algorithm Vals: {hr}, {spo2}");
                                 return (hr, spo2);
                             }
                             else
                             {
-                                //Console.WriteLine("File format is incorrect.");
+                                Console.WriteLine("File format is incorrect.");
                             }
                         }
                         else
                         {
-                            //Console.WriteLine("File is empty.");
+                            Console.WriteLine("File is empty.");
                         }
                     }
                     else
                     {
-                        //Console.WriteLine("File does not exist.");
+                        Console.WriteLine("File does not exist.");
                     }
                 }
                 catch (Exception ex)
@@ -422,8 +423,12 @@ namespace DelsysSigNIalGen
                 cutArray = resArray[(firstIdx - 10_000)..(lastIdx + 10_000)];
             }
 
+            // Save cutArray to CSV
+            SaveArrayToCsv("C:/Users/TJoe/Documents/Comms Intermmediate Outputs/txencoded.csv", cutArray);
+
             UpsampleUpshift(cutArray, waveBuff, calls);
         }
+
 
         // Identify the start and end of the packets
         private static (int, int) GetIdxs(float[] data)
@@ -608,7 +613,78 @@ namespace DelsysSigNIalGen
                 {
                     scaledValues[i] = Map(sigout[i], inputMin, inputMax, outputMin, outputMax);
                 }
+                // Save cutArray to CSV
+                SaveArrayToCsv("C:/Users/TJoe/Documents/Comms Intermmediate Outputs/txboosted.csv", scaledValues);
+
                 waveBuff.Add(scaledValues);
+            }
+
+        }
+
+        private static void SaveArrayToCsv(string csvPath, float[] cutArray)
+        {
+            // Check if the file exists
+            if (!File.Exists(csvPath))
+            {
+                // Create CSV and add the first column
+                using (var writer = new StreamWriter(csvPath))
+                {
+                    // Write header for the first column
+                    writer.WriteLine("Column_1");
+
+                    // Write data for the first column
+                    foreach (var value in cutArray)
+                    {
+                        writer.WriteLine(value);
+                    }
+                }
+            }
+            else
+            {
+                // Append new column to the existing CSV
+                var allLines = File.ReadAllLines(csvPath).ToList();
+
+                // Split headers and data
+                var headers = allLines[0].Split(',');
+                var dataRows = allLines.Skip(1).ToList();
+
+                // Add new column header
+                string newHeader = $"Column_{headers.Length + 1}";
+                headers = headers.Append(newHeader).ToArray();
+
+                // Ensure enough rows to accommodate the new column
+                int maxRows = Math.Max(dataRows.Count, cutArray.Length);
+                while (dataRows.Count < maxRows)
+                {
+                    dataRows.Add(string.Empty);
+                }
+
+                // Append the new column's data
+                for (int i = 0; i < maxRows; i++)
+                {
+                    string newValue = i < cutArray.Length ? cutArray[i].ToString() : string.Empty;
+                    if (i < dataRows.Count && !string.IsNullOrEmpty(dataRows[i]))
+                    {
+                        dataRows[i] += $",{newValue}";
+                    }
+                    else
+                    {
+                        dataRows[i] = newValue;
+                    }
+                }
+
+                // Write updated CSV
+                using (var writer = new StreamWriter(csvPath))
+                {
+                    // Write headers
+                    writer.WriteLine(string.Join(",", headers));
+
+                    // Write rows
+                    foreach (var row in dataRows)
+                    {
+                        writer.WriteLine(row);
+                    }
+                }
             }
         }
 
