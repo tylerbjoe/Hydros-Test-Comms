@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -46,7 +46,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -71,10 +71,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>C:\Software\Hydros\MA-Transmit\HYDROS_COMMS-x64\Receive\SignalGenUtility-\bin\Debug\net8.0-windows</OutDir>
+    <OutDir>C:\Users\AThynne\source\repos\RecieverTest\RecieverTest\bin\Debug\net8.0</OutDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>..\SignalGenUtility-\bin\Debug\net8.0-windows</OutDir>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>..\SignalGenUtility-\bin\Release\net8.0-windows</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -82,14 +83,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\AEngel\Documents\Github\HYDROS_COMMS\Receive\SignalGenUtility-\include;C:\Users\AEngel\Desktop\SignalGenUtility-\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalUsingDirectories>C:\Users\AEngel\Documents\Github\HYDROS_COMMS\Receive\SignalGenUtility-\include;C:\Users\AEngel\Desktop\git_Modem\HYDROS\SignalGenUtility-\include;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <AdditionalIncludeDirectories>"C:\Users\AThynne\Downloads\HYDROS_COMMS\fftw-3.3.5-dll32"</AdditionalIncludeDirectories>
+      <AdditionalUsingDirectories>%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\AEngel\Documents\Github\HYDROS_COMMS\Receive\SignalGenUtility-\include;C:\Users\AEngel\Desktop\SignalGenUtility-\include;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libfftw3-3.lib;libfftw3f-3.lib;libfftw3l-3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>"C:\Users\AThynne\Downloads\HYDROS_COMMS\fftw-3.3.5-dll32"</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libfftw3-3.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -114,14 +115,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Software\Hydros\MA-Transmit\HYDROS_COMMS-x64\Receive\SignalGenUtility-\include</AdditionalIncludeDirectories>
-      <AdditionalUsingDirectories>C:\Software\Hydros\MA-Transmit\HYDROS_COMMS-x64\Receive\SignalGenUtility-\include</AdditionalUsingDirectories>
+      <AdditionalIncludeDirectories>"C:\Users\AThynne\Downloads\Current Projects\HYDROS_COMMS-Andrew\Receive\SignalGenUtility-\include"</AdditionalIncludeDirectories>
+      <AdditionalUsingDirectories>"C:\Users\AThynne\Downloads\Current Projects\HYDROS_COMMS-Andrew\Receive\SignalGenUtility-\include"</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Software\Hydros\MA-Transmit\HYDROS_COMMS-x64\Receive\SignalGenUtility-\include</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libfftw3-3.lib;libfftw3f-3.lib;libfftw3l-3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>"C:\Users\AThynne\Downloads\Current Projects\HYDROS_COMMS-Andrew\Receive\SignalGenUtility-\include"</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libfftw3-3.lib;libfftw3f-3.lib;libfftw3l-3.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -132,12 +133,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\TMullenberg\Desktop\HYDROS_COMMS-Anna\Transmit &amp; Receive\SignalGenUtility-\include</AdditionalIncludeDirectories>
+      <AdditionalUsingDirectories>C:\Users\TMullenberg\Desktop\HYDROS_COMMS-Anna\Transmit &amp; Receive\SignalGenUtility-\include</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Users\TMullenberg\Desktop\HYDROS_COMMS-Anna\Transmit &amp; Receive\SignalGenUtility-\include</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libfftw3-3.lib;libfftw3f-3.lib;libfftw3l-3.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

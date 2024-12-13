@@ -144,6 +144,7 @@ public sealed partial class HardwareModel : ObservableObject
             };
             multiView.ShowDialog();
             Trace.WriteLine(vm.SelectedNICard);
+            var x = vm.SelectedNICard;
             _ff.InitNICard(vm.SelectedNICard);
         }
         else if (_ff.GetNIConnected().Length == 1)

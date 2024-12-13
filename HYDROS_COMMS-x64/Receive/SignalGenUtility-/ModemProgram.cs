@@ -1,5 +1,4 @@
-﻿
-using Org.BouncyCastle.Asn1.Ocsp; // why is this randomly spawning in
+﻿using Org.BouncyCastle.Asn1.Ocsp; // why is this randomly spawning in
 using System;
 using System.Net.Sockets;
 using System.Text;
@@ -23,6 +22,7 @@ using ControlzEx.Standard;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using static System.Net.Mime.MediaTypeNames;
 using DelsysSigNIalGen.ViewModel;
+using System.Windows.Markup;
 
 namespace DelsysSigNIalGen
 {
@@ -356,6 +356,7 @@ namespace DelsysSigNIalGen
             Complex[] forwardOut = new Complex[origLength];
             fftDLLLayer.fftwTransform(input, forwardOut, origLength); // WAY FASTER!
             //Fourier.Forward(input, FourierOptions.Matlab);
+
             input = forwardOut;
 
             // Resampling using Fourier method
@@ -406,7 +407,7 @@ namespace DelsysSigNIalGen
 
         // Downsample sigin from fs_bef to fs_down. And downshift from fc_bef to fc_down
         public static float[] DownsampleDownshift(double[] sigin, int calls)
-        {
+        {       
             float fs_down = 102_400; // changed 102_400
             float fc_down = 35_000;
             float fs_bef = 1_000_000;

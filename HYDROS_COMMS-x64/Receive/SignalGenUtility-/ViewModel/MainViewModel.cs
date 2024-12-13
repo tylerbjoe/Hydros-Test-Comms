@@ -34,6 +34,11 @@ using Org.BouncyCastle.Bcpg;
 using System.Windows.Media.Imaging;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using static CommunityToolkit.Mvvm.ComponentModel.__Internals.__TaskExtensions.TaskAwaitableWithoutEndValidation;
+using System.Security.Policy;
+using Microsoft.VisualBasic.ApplicationServices;
+using System.Security.Cryptography;
+using System.Windows.Markup;
+using System.Collections;
 
 namespace DelsysSigNIalGen.ViewModel;
 
@@ -73,6 +78,129 @@ partial class MainViewModel : ObservableObject
             {
                 (clientDec, pcmClientDec) = (clientTestDec, pcmClientTestDec);
                 (streamDec, pcmStreamDec) = (streamTestDec, pcmStreamTestDec);
+            }
+        }
+
+        string filePath = "C:/Users/TJoe/Documents/Comms Intermmediate Outputs/txboosted3.csv";
+        List<List<double>> columns = new List<List<double>>();
+
+        using (StreamReader reader = new StreamReader(filePath))
+        {
+            string line;
+
+            // Skip the first row (header)
+            bool isHeader = true;
+            bool noEmpty = true;
+            while ((line = reader.ReadLine()) != null)
+            {
+                if (isHeader)
+                {
+                    isHeader = false;
+                    continue; // Skip processing the header row
+                }
+
+                // Split the line into values, assuming comma as the delimiter
+                string[] parts = line.Split(',');
+
+
+                foreach (string part in parts)
+                {
+                    if (part.IsEmpty())
+                    {
+                        noEmpty = false;
+                        Debug.WriteLine("empty detected!!!!!!!");
+                        break;
+                    }
+                }
+                if (!noEmpty)
+                {
+                    break;
+                }
+
+                // Ensure columns list is large enough to hold all values
+                while (columns.Count < parts.Length)
+                {
+                    columns.Add(new List<double>());
+                }
+
+                // Add each value to its corresponding column
+                for (int i = 0; i < parts.Length; i++)
+                {
+                    columns[i].Add(double.Parse(parts[i]));
+                }
+            }
+        }
+
+        float[][] signals = new float[columns.Count][];
+        for (int i = 0; i < columns.Count; i++)
+        {
+            signals[i] = ModemProgram.DownsampleDownshift(columns[i].ToArray(), 0);
+            float[] cutArray = signals[i];
+            string csvPath = "C:/Users/TJoe/Documents/Comms Intermmediate Outputs/rxdsds3.csv";
+            if (!File.Exists(csvPath))
+            {
+                // Create CSV and add the first column
+                using (var writer = new StreamWriter(csvPath))
+                {
+                    // Write header for the first column
+                    writer.WriteLine("Column_1");
+
+                    // Write data for the first column
+                    foreach (var value in cutArray)
+
+                    {
+                        writer.WriteLine(value);
+                    }
+                }
+            }
+
+            else
+            {
+                // Append new column to the existing CSV
+                var allLines = File.ReadAllLines(csvPath).ToList();
+
+                // Split headers and data
+                var headers = allLines[0].Split(',');
+                var dataRows = allLines.Skip(1).ToList();
+
+                // Add new column header
+                string newHeader = $"Column_{headers.Length + 1}";
+                headers = headers.Append(newHeader).ToArray();
+
+                // Ensure enough rows to accommodate the new column
+                int maxRows = Math.Max(dataRows.Count, cutArray.Length);
+
+                while (dataRows.Count < maxRows)
+                {
+                    dataRows.Add(string.Empty);
+                }
+
+                // Append the new column's data
+                for (int ii = 0; ii < maxRows; ii++)
+                {
+                    string newValue = i < cutArray.Length ? cutArray[ii].ToString() : string.Empty;
+                    if (ii < dataRows.Count && !string.IsNullOrEmpty(dataRows[ii]))
+                    {
+                        dataRows[ii] += $",{newValue}";
+                    }
+                    else
+                    {
+                        dataRows[ii] = newValue;
+                    }
+                }
+
+                // Write updated CSV
+                using (var writer = new StreamWriter(csvPath))
+                {
+                    // Write headers
+                    writer.WriteLine(string.Join(",", headers));
+                    // Write rows
+                    foreach (var row in dataRows)
+
+                    {
+                        writer.WriteLine(row);
+                    }
+                }
             }
         }
 
@@ -151,6 +279,7 @@ partial class MainViewModel : ObservableObject
         {
             try
             {
+                var x = _ff.AIRead.DataBuffer;
                 if (!_ff.AIRead.DataBuffer.IsEmpty())
                 {
                     if (_ff.AIRead.DataBuffer.Count > 1)

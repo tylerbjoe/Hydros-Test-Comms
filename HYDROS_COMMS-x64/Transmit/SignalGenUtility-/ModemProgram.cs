@@ -579,6 +579,14 @@ namespace DelsysSigNIalGen
             int down = (int)fs_og;
             var resampled = Resample(bb_filtered, up, down);
 
+            double[] realComponents = new double[resampled.Length];
+            for (int i = 0; i < resampled.Length; i++)
+            {
+                realComponents[i] = resampled[i].Real;
+            }
+
+            SaveArrayToCsv("C:/Users/TJoe/Documents/Comms Intermmediate Outputs/txus.csv", realComponents);
+
             // Modulate to passband
             int resampledLen = resampled.Length;
             Complex[] pb = new Complex[resampledLen];
@@ -614,13 +622,78 @@ namespace DelsysSigNIalGen
                     scaledValues[i] = Map(sigout[i], inputMin, inputMax, outputMin, outputMax);
                 }
                 // Save cutArray to CSV
-                SaveArrayToCsv("C:/Users/TJoe/Documents/Comms Intermmediate Outputs/txboosted.csv", scaledValues);
+                SaveArrayToCsv("C:/Users/TJoe/Documents/Comms Intermmediate Outputs/txusus.csv", scaledValues);
 
                 waveBuff.Add(scaledValues);
             }
 
         }
+        private static void SaveArrayToCsv(string csvPath, double[] cutArray)
+        {
+            // Check if the file exists
+            if (!File.Exists(csvPath))
+            {
+                // Create CSV and add the first column
+                using (var writer = new StreamWriter(csvPath))
+                {
+                    // Write header for the first column
+                    writer.WriteLine("Column_1");
 
+                    // Write data for the first column
+                    foreach (var value in cutArray)
+                    {
+                        writer.WriteLine(value);
+                    }
+                }
+            }
+            else
+            {
+                // Append new column to the existing CSV
+                var allLines = File.ReadAllLines(csvPath).ToList();
+
+                // Split headers and data
+                var headers = allLines[0].Split(',');
+                var dataRows = allLines.Skip(1).ToList();
+
+                // Add new column header
+                string newHeader = $"Column_{headers.Length + 1}";
+                headers = headers.Append(newHeader).ToArray();
+
+                // Ensure enough rows to accommodate the new column
+                int maxRows = Math.Max(dataRows.Count, cutArray.Length);
+                while (dataRows.Count < maxRows)
+                {
+                    dataRows.Add(string.Empty);
+                }
+
+                // Append the new column's data
+                for (int i = 0; i < maxRows; i++)
+                {
+                    string newValue = i < cutArray.Length ? cutArray[i].ToString() : string.Empty;
+                    if (i < dataRows.Count && !string.IsNullOrEmpty(dataRows[i]))
+                    {
+                        dataRows[i] += $",{newValue}";
+                    }
+                    else
+                    {
+                        dataRows[i] = newValue;
+                    }
+                }
+
+                // Write updated CSV
+                using (var writer = new StreamWriter(csvPath))
+                {
+                    // Write headers
+                    writer.WriteLine(string.Join(",", headers));
+
+                    // Write rows
+                    foreach (var row in dataRows)
+                    {
+                        writer.WriteLine(row);
+                    }
+                }
+            }
+        }
         private static void SaveArrayToCsv(string csvPath, float[] cutArray)
         {
             // Check if the file exists
