@@ -81,129 +81,6 @@ partial class MainViewModel : ObservableObject
             }
         }
 
-        string filePath = "C:/Users/TJoe/Documents/Comms Intermmediate Outputs/txboosted3.csv";
-        List<List<double>> columns = new List<List<double>>();
-
-        using (StreamReader reader = new StreamReader(filePath))
-        {
-            string line;
-
-            // Skip the first row (header)
-            bool isHeader = true;
-            bool noEmpty = true;
-            while ((line = reader.ReadLine()) != null)
-            {
-                if (isHeader)
-                {
-                    isHeader = false;
-                    continue; // Skip processing the header row
-                }
-
-                // Split the line into values, assuming comma as the delimiter
-                string[] parts = line.Split(',');
-
-
-                foreach (string part in parts)
-                {
-                    if (part.IsEmpty())
-                    {
-                        noEmpty = false;
-                        Debug.WriteLine("empty detected!!!!!!!");
-                        break;
-                    }
-                }
-                if (!noEmpty)
-                {
-                    break;
-                }
-
-                // Ensure columns list is large enough to hold all values
-                while (columns.Count < parts.Length)
-                {
-                    columns.Add(new List<double>());
-                }
-
-                // Add each value to its corresponding column
-                for (int i = 0; i < parts.Length; i++)
-                {
-                    columns[i].Add(double.Parse(parts[i]));
-                }
-            }
-        }
-
-        float[][] signals = new float[columns.Count][];
-        for (int i = 0; i < columns.Count; i++)
-        {
-            signals[i] = ModemProgram.DownsampleDownshift(columns[i].ToArray(), 0);
-            float[] cutArray = signals[i];
-            string csvPath = "C:/Users/TJoe/Documents/Comms Intermmediate Outputs/rxdsds3.csv";
-            if (!File.Exists(csvPath))
-            {
-                // Create CSV and add the first column
-                using (var writer = new StreamWriter(csvPath))
-                {
-                    // Write header for the first column
-                    writer.WriteLine("Column_1");
-
-                    // Write data for the first column
-                    foreach (var value in cutArray)
-
-                    {
-                        writer.WriteLine(value);
-                    }
-                }
-            }
-
-            else
-            {
-                // Append new column to the existing CSV
-                var allLines = File.ReadAllLines(csvPath).ToList();
-
-                // Split headers and data
-                var headers = allLines[0].Split(',');
-                var dataRows = allLines.Skip(1).ToList();
-
-                // Add new column header
-                string newHeader = $"Column_{headers.Length + 1}";
-                headers = headers.Append(newHeader).ToArray();
-
-                // Ensure enough rows to accommodate the new column
-                int maxRows = Math.Max(dataRows.Count, cutArray.Length);
-
-                while (dataRows.Count < maxRows)
-                {
-                    dataRows.Add(string.Empty);
-                }
-
-                // Append the new column's data
-                for (int ii = 0; ii < maxRows; ii++)
-                {
-                    string newValue = i < cutArray.Length ? cutArray[ii].ToString() : string.Empty;
-                    if (ii < dataRows.Count && !string.IsNullOrEmpty(dataRows[ii]))
-                    {
-                        dataRows[ii] += $",{newValue}";
-                    }
-                    else
-                    {
-                        dataRows[ii] = newValue;
-                    }
-                }
-
-                // Write updated CSV
-                using (var writer = new StreamWriter(csvPath))
-                {
-                    // Write headers
-                    writer.WriteLine(string.Join(",", headers));
-                    // Write rows
-                    foreach (var row in dataRows)
-
-                    {
-                        writer.WriteLine(row);
-                    }
-                }
-            }
-        }
-
         AI_Names = new List<string>();
         foreach (var value in HardwareModel.Instance.PhysicalHardware)
         {
@@ -536,7 +413,64 @@ partial class MainViewModel : ObservableObject
         {
             Task.Run(() => ModemProgram.decodeControls(streamDec));
         }
-        Task.Run(() => ReadPackets());
+        //BEGIN SIMULATED DATA
+        string filePath = "C:/Users/TJoe/Documents/Comms Intermmediate Outputs/txboosted50.csv";
+        List<List<double>> columns = new List<List<double>>();
+        using (StreamReader reader = new StreamReader(filePath))
+        {
+            string line;
+
+            // Skip the first row (header)
+            bool isHeader = true;
+            bool noEmpty = true;
+            while ((line = reader.ReadLine()) != null)
+            {
+                if (isHeader)
+                {
+                    isHeader = false;
+                    continue; // Skip processing the header row
+                }
+
+                // Split the line into values, assuming comma as the delimiter
+                string[] parts = line.Split(',');
+
+
+                foreach (string part in parts)
+                {
+                    if (part.IsEmpty())
+                    {
+                        noEmpty = false;
+                        Debug.WriteLine("empty detected!!!!!!!");
+                        break;
+                    }
+                }
+                if (!noEmpty)
+                {
+                    break;
+                }
+
+                // Ensure columns list is large enough to hold all values
+                while (columns.Count < parts.Length)
+                {
+                    columns.Add(new List<double>());
+                }
+
+                // Add each value to its corresponding column
+                for (int i = 0; i < parts.Length; i++)
+                {
+                    columns[i].Add(double.Parse(parts[i]));
+                }
+            }
+        }
+        for (int i = 0; i < columns.Count; i++)
+        {
+            ModemProgram.DownsampleDownshift(columns[i].ToArray(), 0);
+        }
+        //System.Environment.Exit(0);
+        //END
+        //double[] column = columns[1].ToArray();
+
+        Task.Run(() => ReadPackets(columns));
     }
 
     [RelayCommand]
@@ -697,24 +631,41 @@ partial class MainViewModel : ObservableObject
     }
 
     // Gets 0.5s of data at a time from consumer architecture
-    private void ReadPackets()
+    private void ReadPackets(List<List<double>> columns)//() 
     {
         int calls = 0;
+        int val = 0;
         while (!ModemProgram.globalStopped)
         {
             double[] takenData = null;
+            double[] unusedDACData = null;
             try
             {
-                takenData = readBuff.Take(); // See if data loaded in
+
+                takenData = columns[val].ToArray();  // to read waveform data from csv files
+                //takenData = readBuff.Take(); // gets waveform data from DAC buffer
+
+                //// need to flush the readBuff so does not overflow
+                //while (readBuff.TryTake(out double[] item))
+                //{
+                //    // do nothing with it
+                //}
+
+                unusedDACData = readBuff.Take(); // See if data loaded in
             }
             catch (InvalidOperationException) { }
             if (takenData != null)
             {
                 // Downsample first
                 float[] dfDowned = ModemProgram.DownsampleDownshift(takenData, calls);
+
                 // Send downsampled wave data to modem
                 ModemProgram.decodeMyWav(pcmStreamDec, dfDowned);
                 calls++;
+                val++;
+                if (val == 50)
+                        val=0;
+
             }
         }
         Debug.WriteLine("\r\nReading Waveform Buffer Done.");

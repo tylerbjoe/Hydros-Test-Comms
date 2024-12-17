@@ -58,17 +58,23 @@ namespace DelsysSigNIalGen
             byte[] responseData = new byte[256];
 
             int bytes = stream.Read(responseData, 0, responseData.Length); // .Result
+
             string response = Encoding.UTF8.GetString(responseData, 0, bytes);
 
+            //Debug.WriteLine("Response:", response);
+
             // Add to log
-            //using (StreamWriter sw = new StreamWriter($"C:\\Users\\AEngel\\Documents\\outputLogs\\outputLog_{trialNum}.txt", true))
-            using (StreamWriter sw = new StreamWriter(logPath, true)) // appends = true here
+            using (StreamWriter sw = new StreamWriter($"C:\\Users\\TJoe\\Documents\\outputLogs\\outputLog_{trialNum}.txt", true))
+            //using (StreamWriter sw = new StreamWriter(logPath, true)) // appends = true here UNCOMMENT FOR LINE BEFORE PREVIOUSLY
             {
                 sw.WriteLine(response);
             }
 
             if (response.Contains("Data"))
             {
+
+                //Debug.WriteLine("Line with data:", response);
+
                 // Find the index of the start of the "Data" array
                 int startIndex = response.IndexOf('[');
                 if (startIndex != -1)
@@ -79,6 +85,9 @@ namespace DelsysSigNIalGen
                     {
                         // Extract the substring containing the "Data" array
                         string dataSubstring = response.Substring(startIndex, endIndex - startIndex + 1);
+
+                        //Debug.WriteLine("substring", dataSubstring);
+
 
                         // Parse the substring into a list of integers
                         List<int> dataList = ParseDataList(dataSubstring);
@@ -342,6 +351,8 @@ namespace DelsysSigNIalGen
         {
             byte[] responseData = new byte[nbytesTot];
             int nbytes = pcmStream.Read(responseData, 0, responseData.Length);
+
+            // call to parsing method
         }
 
         // Resample with ffts -- Note the complex signal
@@ -407,7 +418,9 @@ namespace DelsysSigNIalGen
 
         // Downsample sigin from fs_bef to fs_down. And downshift from fc_bef to fc_down
         public static float[] DownsampleDownshift(double[] sigin, int calls)
-        {       
+        {
+            //SAVE INPUT
+            //SaveArrayToCsv("C:/Users/TJoe/Documents/Comms Intermmediate Outputs/rx.csv", sigin);
             float fs_down = 102_400; // changed 102_400
             float fc_down = 35_000;
             float fs_bef = 1_000_000;
@@ -424,6 +437,13 @@ namespace DelsysSigNIalGen
 
             int resLen = (int)Math.Round(sigin.Length * 102_400.0 / 1_000_000.0);
             var resampled = ResComp(sigComplex, resLen); // 512000
+            // SAVE DOWNSHIFT REAL COMPONENTS
+            //double[] realComponents = new double[resampled.Length];
+            //for (int i = 0; i < resampled.Length; i++)
+            //{
+            //    realComponents[i] = resampled[i].Real;
+            //}
+            //SaveArrayToCsv("C:/Users/TJoe/Documents/Comms Intermmediate Outputs/rxds.csv", realComponents);
 
             // Undo modulate to baseband
             int resampledLen = resampled.Length;
@@ -433,6 +453,13 @@ namespace DelsysSigNIalGen
                 double bb_factor = -2 * Math.PI * fc_down * (i + 1) / fs_down; // +1 to match np.arange start @ 1
                 no_bb[i] = Complex.Divide(resampled[i], Complex.Exp(new Complex(0, bb_factor)));
             }
+            // SAVE BB REAL COMPONENTS
+            double[] realComponentss = new double[no_bb.Length];
+            //for (int i = 0; i < no_bb.Length; i++)
+            //{
+            //    realComponentss[i] = no_bb[i].Real;
+            //}
+            //SaveArrayToCsv("C:/Users/TJoe/Documents/Comms Intermmediate Outputs/rxnbb.csv", realComponentss);
 
             // Subtract imag component from real component
             float[] sigout = new float[no_bb.Length];
@@ -440,8 +467,143 @@ namespace DelsysSigNIalGen
             {
                 sigout[i] = (float)(no_bb[i].Real - no_bb[i].Imaginary);
             }
+            // SAVE DOWNSHIFT
+            //SaveArrayToCsv("C:/Users/TJoe/Documents/Comms Intermmediate Outputs/rxdsds.csv", sigout);
 
             return sigout;
+        }
+
+        private static void SaveArrayToCsv(string csvPath, double[] cutArray)
+        {
+            // Check if the file exists
+            if (!File.Exists(csvPath))
+            {
+                // Create CSV and add the first column
+                using (var writer = new StreamWriter(csvPath))
+                {
+                    // Write header for the first column
+                    writer.WriteLine("Column_1");
+
+                    // Write data for the first column
+                    foreach (var value in cutArray)
+                    {
+                        writer.WriteLine(value);
+                    }
+                }
+            }
+            else
+            {
+                // Append new column to the existing CSV
+                var allLines = File.ReadAllLines(csvPath).ToList();
+
+                // Split headers and data
+                var headers = allLines[0].Split(',');
+                var dataRows = allLines.Skip(1).ToList();
+
+                // Add new column header
+                string newHeader = $"Column_{headers.Length + 1}";
+                headers = headers.Append(newHeader).ToArray();
+
+                // Ensure enough rows to accommodate the new column
+                int maxRows = Math.Max(dataRows.Count, cutArray.Length);
+                while (dataRows.Count < maxRows)
+                {
+                    dataRows.Add(string.Empty);
+                }
+
+                // Append the new column's data
+                for (int i = 0; i < maxRows; i++)
+                {
+                    string newValue = i < cutArray.Length ? cutArray[i].ToString() : string.Empty;
+                    if (i < dataRows.Count && !string.IsNullOrEmpty(dataRows[i]))
+                    {
+                        dataRows[i] += $",{newValue}";
+                    }
+                    else
+                    {
+                        dataRows[i] = newValue;
+                    }
+                }
+
+                // Write updated CSV
+                using (var writer = new StreamWriter(csvPath))
+                {
+                    // Write headers
+                    writer.WriteLine(string.Join(",", headers));
+
+                    // Write rows
+                    foreach (var row in dataRows)
+                    {
+                        writer.WriteLine(row);
+                    }
+                }
+            }
+        }
+        private static void SaveArrayToCsv(string csvPath, float[] cutArray)
+        {
+            // Check if the file exists
+            if (!File.Exists(csvPath))
+            {
+                // Create CSV and add the first column
+                using (var writer = new StreamWriter(csvPath))
+                {
+                    // Write header for the first column
+                    writer.WriteLine("Column_1");
+
+                    // Write data for the first column
+                    foreach (var value in cutArray)
+                    {
+                        writer.WriteLine(value);
+                    }
+                }
+            }
+            else
+            {
+                // Append new column to the existing CSV
+                var allLines = File.ReadAllLines(csvPath).ToList();
+
+                // Split headers and data
+                var headers = allLines[0].Split(',');
+                var dataRows = allLines.Skip(1).ToList();
+
+                // Add new column header
+                string newHeader = $"Column_{headers.Length + 1}";
+                headers = headers.Append(newHeader).ToArray();
+
+                // Ensure enough rows to accommodate the new column
+                int maxRows = Math.Max(dataRows.Count, cutArray.Length);
+                while (dataRows.Count < maxRows)
+                {
+                    dataRows.Add(string.Empty);
+                }
+
+                // Append the new column's data
+                for (int i = 0; i < maxRows; i++)
+                {
+                    string newValue = i < cutArray.Length ? cutArray[i].ToString() : string.Empty;
+                    if (i < dataRows.Count && !string.IsNullOrEmpty(dataRows[i]))
+                    {
+                        dataRows[i] += $",{newValue}";
+                    }
+                    else
+                    {
+                        dataRows[i] = newValue;
+                    }
+                }
+
+                // Write updated CSV
+                using (var writer = new StreamWriter(csvPath))
+                {
+                    // Write headers
+                    writer.WriteLine(string.Join(",", headers));
+
+                    // Write rows
+                    foreach (var row in dataRows)
+                    {
+                        writer.WriteLine(row);
+                    }
+                }
+            }
         }
 
         // Close Modem stream & client connections
