@@ -550,6 +550,7 @@ namespace DelsysSigNIalGen
 
         public static void UpsampleUpshift(float[] sigin, BlockingCollection<float[]> waveBuff, int calls, bool down_next = false)
         {
+            
             float fs_og = 102_400;
             float fc_og = 35_000;
             float fs_up = 1_000_000;
@@ -560,11 +561,11 @@ namespace DelsysSigNIalGen
             Complex[] sigComplex = new Complex[sigLen];
             for (int i = 0; i < sigLen; i++)
             {
-                double phase = -2 * Math.PI * fc_og * (i + 1) / fs_og; // +1 to match Python's 1-based indexing in arange
-                sigComplex[i] = new Complex(sigin[i], 0) * Complex.Exp(new Complex(0, phase));
+                double phase = -2 * Math.PI * fc_og * (i + 1) / fs_og; // +1 to match Python's 1-based indexing in arange  // equiv to -iwt
+                sigComplex[i] = new Complex(sigin[i], 0) * Complex.Exp(new Complex(0, phase));  // sigComplex = s(t) * e^{-iwt}
             }
 
-            // FIR filter with Hamming window
+            // FIR filter with Hamming window  // lowpass filter to remove high-freq. terms
             int filterOrder = 1024;
             double cutoffFreq = 2 * 5120 / fs_og;
 
@@ -572,7 +573,7 @@ namespace DelsysSigNIalGen
             // Design the FIR filter coefficients
             double[] firCoefficients = DesignLowPassFIRFilter(cutoffFreq, filterOrder, hammingWindow);
             // Apply filtfilt
-            Complex[] bb_filtered = Filfilt(firCoefficients, sigComplex);
+            Complex[] bb_filtered = Filfilt(firCoefficients, sigComplex); // bb_filtered = m(t)
 
             // Resample
             int up = (int)fs_up;
@@ -582,10 +583,10 @@ namespace DelsysSigNIalGen
             double[] realComponents = new double[resampled.Length];
             for (int i = 0; i < resampled.Length; i++)
             {
-                realComponents[i] = resampled[i].Real;
+                realComponents[i] = resampled[i].Real;  // m(t) at 1 MHz sample rate
             }
 
-            SaveArrayToCsv("C:/Users/TJoe/Documents/Comms Intermmediate Outputs/txus.csv", realComponents);
+            //SaveArrayToCsv("C:/Users/TJoe/Documents/Comms Intermmediate Outputs/txus.csv", realComponents);
 
             // Modulate to passband
             int resampledLen = resampled.Length;
@@ -605,7 +606,7 @@ namespace DelsysSigNIalGen
                 float[] sigout = new float[pb.Length];
                 for (int i = 0; i < pb.Length; i++)
                 {
-                    sigout[i] = (float)(pb[i].Real - pb[i].Imaginary);
+                    sigout[i] = (float)(pb[i].Real - pb[i].Imaginary);  // new s(t) at the HYDROS pass band
                 }
                 // Define input range
                 float inputMin = sigout.Min();
@@ -619,10 +620,10 @@ namespace DelsysSigNIalGen
                 float[] scaledValues = new float[sigout.Length];
                 for (int i = 0; i < sigout.Length; i++)
                 {
-                    scaledValues[i] = Map(sigout[i], inputMin, inputMax, outputMin, outputMax);
+                    scaledValues[i] = Map(sigout[i], inputMin, inputMax, outputMin, outputMax);  // s(t) rescaled to DAC voltages
                 }
                 // Save cutArray to CSV
-                SaveArrayToCsv("C:/Users/TJoe/Documents/Comms Intermmediate Outputs/txusus.csv", scaledValues);
+                //SaveArrayToCsv("C:/Users/TJoe/Documents/Comms Intermmediate Outputs/txusus.csv", scaledValues);
 
                 waveBuff.Add(scaledValues);
             }

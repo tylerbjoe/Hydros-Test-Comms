@@ -426,13 +426,13 @@ namespace DelsysSigNIalGen
             float fs_bef = 1_000_000;
             float fc_bef = (float)secretCarrierFrequency;
 
-            // Undo modulate to passband
+            // Undo modulate to passband  sigin = s(t) at HYDROS passband
             int sigLen = sigin.Length;
             Complex[] sigComplex = new Complex[sigLen];
             for (int i = 0; i < sigLen; i++)
             {
-                double pb_factor = 2 * Math.PI * fc_bef * (i + 1) / fs_bef; // +1 to match Python's 1-based indexing in arange
-                sigComplex[i] = Complex.Divide(new Complex(sigin[i], 0), Complex.Exp(new Complex(0, pb_factor)));
+                double pb_factor = -2 * Math.PI * fc_bef * (i + 1) / fs_bef; // +1 to match Python's 1-based indexing in arange
+                sigComplex[i] = new Complex(sigin[i], 0) * Complex.Exp(new Complex(0, pb_factor));
             }
 
             int resLen = (int)Math.Round(sigin.Length * 102_400.0 / 1_000_000.0);
@@ -445,13 +445,13 @@ namespace DelsysSigNIalGen
             //}
             //SaveArrayToCsv("C:/Users/TJoe/Documents/Comms Intermmediate Outputs/rxds.csv", realComponents);
 
-            // Undo modulate to baseband
+            // Undo modulate to baseband (go back to Popoto passband)
             int resampledLen = resampled.Length;
             Complex[] no_bb = new Complex[resampledLen];
             for (int i = 0; i < resampledLen; i++)
             {
-                double bb_factor = -2 * Math.PI * fc_down * (i + 1) / fs_down; // +1 to match np.arange start @ 1
-                no_bb[i] = Complex.Divide(resampled[i], Complex.Exp(new Complex(0, bb_factor)));
+                double bb_factor = 2 * Math.PI * fc_down * (i + 1) / fs_down; // +1 to match np.arange start @ 1
+                no_bb[i] = resampled[i] * Complex.Exp(new Complex(0, bb_factor));
             }
             // SAVE BB REAL COMPONENTS
             double[] realComponentss = new double[no_bb.Length];
@@ -470,7 +470,7 @@ namespace DelsysSigNIalGen
             // SAVE DOWNSHIFT
             //SaveArrayToCsv("C:/Users/TJoe/Documents/Comms Intermmediate Outputs/rxdsds.csv", sigout);
 
-            return sigout;
+            return sigout; // s(t) in popoto passband
         }
 
         private static void SaveArrayToCsv(string csvPath, double[] cutArray)
