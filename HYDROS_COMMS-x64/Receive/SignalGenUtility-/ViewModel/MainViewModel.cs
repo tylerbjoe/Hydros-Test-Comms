@@ -466,9 +466,6 @@ partial class MainViewModel : ObservableObject
         {
             ModemProgram.DownsampleDownshift(columns[i].ToArray(), 0);
         }
-        //System.Environment.Exit(0);
-        //END
-        //double[] column = columns[1].ToArray();
 
         Task.Run(() => ReadPackets(columns));
     }
@@ -642,16 +639,12 @@ partial class MainViewModel : ObservableObject
             try
             {
 
-                takenData = columns[val].ToArray();  // to read waveform data from csv files
-                //takenData = readBuff.Take(); // gets waveform data from DAC buffer
+                //takenData = columns[val].ToArray();  // to read waveform data from csv files
+                //unusedDACData = readBuff.Take(); // get DAC data then do nothing with it
 
-                //// need to flush the readBuff so does not overflow
-                //while (readBuff.TryTake(out double[] item))
-                //{
-                //    // do nothing with it
-                //}
+                takenData = readBuff.Take(); // gets waveform data from DAC buffer
 
-                unusedDACData = readBuff.Take(); // See if data loaded in
+                
             }
             catch (InvalidOperationException) { }
             if (takenData != null)
