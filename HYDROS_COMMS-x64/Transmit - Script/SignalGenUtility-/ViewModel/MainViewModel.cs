@@ -318,7 +318,7 @@ partial class MainViewModel : ObservableObject
         //Trace.WriteLine("Finished exporting to CSV");
 
         Trace.WriteLine("Exporting to .bin");
-        using (FileStream fs = new FileStream($"C:\\Users\\AEngel.DELSYS\\Documents\\finalExportedBins\\FullAfterOutput_{ModemProgram.trialNum}.bin", FileMode.Create, FileAccess.Write, FileShare.None))
+        using (FileStream fs = new FileStream($"C:\\Users\\TJoe\\Documents\\finalExportedBins\\FullAfterOutput_{ModemProgram.trialNum}.bin", FileMode.Create, FileAccess.Write, FileShare.None))
         using (BinaryWriter writer = new BinaryWriter(fs))
         {
             for (int i = 0; i < yValues.Length; i++)

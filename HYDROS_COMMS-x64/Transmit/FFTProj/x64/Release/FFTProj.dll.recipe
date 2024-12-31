@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Users\AEngel.DELSYS\Documents\GitHub\HYDROS\SignalGenUtility-\bin\Release\net8.0-windows\FFTProj.dll</FullPath>
+      <FullPath>C:\Software\Hydros\MA-Transmit\HYDROS_COMMS-x64\Transmit\SignalGenUtility-\bin\Release\net8.0-windows\FFTProj.dll</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />
