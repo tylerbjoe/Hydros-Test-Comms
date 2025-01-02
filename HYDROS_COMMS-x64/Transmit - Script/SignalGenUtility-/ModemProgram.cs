@@ -233,16 +233,30 @@ namespace DelsysSigNIalGen
         // Get the hr&spo2 values from CSVs
         public static async Task GetVals(NetworkStream stream, NetworkStream pcmStream, BlockingCollection<float[]> waveBuff, CancellationTokenSource cts)
         {
-            int calls = 0;
+            int calls = 100;
             while (!cts.Token.IsCancellationRequested)  // Check for cancellation request
             {
-                Thread.Sleep(200); // for debugging non-real time, should pause a bit
+                //Thread.Sleep(200); // for debugging non-real time, should pause a bit
                 (int hr, int spo2) = getNextVals(calls);
                 RunModemProgram(hr, spo2, stream, pcmStream, calls, waveBuff);
-                calls++;
+                if (calls == 149)
+                {
+                    calls += 51;
+                    ModemProgram.secretCarrierFrequency = 200000;
+                }
+                else if (calls == 249)
+                {
+                    calls += 51;
+                    ModemProgram.secretCarrierFrequency = 300000;
+                }
+                else
+                {
+                    calls++;
+                }
+                
 
                 // There are currently csvs for 0-179 values. Reset after reaching the end.
-                if (calls == 50)
+                if (calls == 350)
                 {
                     cts.Cancel(); // Cancel the task gracefully after 50 calls
                     break;

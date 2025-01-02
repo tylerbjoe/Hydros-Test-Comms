@@ -165,7 +165,7 @@ partial class MainViewModel : ObservableObject
                     {
                         var bufferSpan = new ReadOnlySpan2D<double>(item);
                         var data = bufferSpan.GetRow(0).ToArray();
-                        PlotData.Append(data);
+                        //PlotData.Append(data);
                         currData.AddRange(data);
                     }
                     if (currData.Count >= 500_000)
@@ -211,7 +211,7 @@ partial class MainViewModel : ObservableObject
                 waveCalls++;
             }
               
-            if (waveCalls == 50)
+            if (waveCalls == 150)
             {
                 cts2.Cancel();
                 break;
@@ -378,19 +378,19 @@ partial class MainViewModel : ObservableObject
 
     }
     Stopwatch sw = new Stopwatch();
-    private void InputData_Sender(object sender, GotInputDataEventArgs e)
-    {
-        Task.Run(() =>
-        {
-            //sw.Restart();
-            var bufferSpan = new ReadOnlySpan2D<double>(e.SamplesBuffer);
-            var data = bufferSpan.GetRow(0).ToArray();
-            for (int i = 0; i < data.Length; i+=1000)
-                PlotData.Append(data[i..(i+999)]);
-            //sw.Stop();
-            //Trace.WriteLine(sw.Elapsed.TotalMilliseconds);
-        });
-    }
+    //private void InputData_Sender(object sender, GotInputDataEventArgs e)
+    //{
+    //    Task.Run(() =>
+    //    {
+    //        //sw.Restart();
+    //        var bufferSpan = new ReadOnlySpan2D<double>(e.SamplesBuffer);
+    //        var data = bufferSpan.GetRow(0).ToArray();
+    //        for (int i = 0; i < data.Length; i+=1000)
+    //            PlotData.Append(data[i..(i+999)]);
+    //        //sw.Stop();
+    //        //Trace.WriteLine(sw.Elapsed.TotalMilliseconds);
+    //    });
+    //}
 
     [RelayCommand]
     private void ConnectNICard()
