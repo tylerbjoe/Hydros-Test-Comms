@@ -38,6 +38,9 @@ namespace DelsysSigNIalGen
         public static int trialNum = 0; // Changes names of files
         public static int secretCarrierFrequency = -1; // Carrier frequency in Hz, for across the water // Will be set by on-screen input
 
+
+
+
         // Receive control messages from modem
         static void GetRecMessages(NetworkStream stream)
         {

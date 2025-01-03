@@ -413,61 +413,7 @@ partial class MainViewModel : ObservableObject
         {
             Task.Run(() => ModemProgram.decodeControls(streamDec));
         }
-        //BEGIN SIMULATED DATA
-        string filePath = "C:/Users/TJoe/Documents/Comms Intermmediate Outputs/txboosted50.csv";
-        List<List<double>> columns = new List<List<double>>();
-        using (StreamReader reader = new StreamReader(filePath))
-        {
-            string line;
-
-            // Skip the first row (header)
-            bool isHeader = true;
-            bool noEmpty = true;
-            while ((line = reader.ReadLine()) != null)
-            {
-                if (isHeader)
-                {
-                    isHeader = false;
-                    continue; // Skip processing the header row
-                }
-
-                // Split the line into values, assuming comma as the delimiter
-                string[] parts = line.Split(',');
-
-
-                foreach (string part in parts)
-                {
-                    if (part.IsEmpty())
-                    {
-                        noEmpty = false;
-                        Debug.WriteLine("empty detected!!!!!!!");
-                        break;
-                    }
-                }
-                if (!noEmpty)
-                {
-                    break;
-                }
-
-                // Ensure columns list is large enough to hold all values
-                while (columns.Count < parts.Length)
-                {
-                    columns.Add(new List<double>());
-                }
-
-                // Add each value to its corresponding column
-                for (int i = 0; i < parts.Length; i++)
-                {
-                    columns[i].Add(double.Parse(parts[i]));
-                }
-            }
-        }
-        for (int i = 0; i < columns.Count; i++)
-        {
-            ModemProgram.DownsampleDownshift(columns[i].ToArray(), 0);
-        }
-
-        Task.Run(() => ReadPackets(columns));
+        Task.Run(() => ReadPackets());
     }
 
     [RelayCommand]
@@ -628,7 +574,7 @@ partial class MainViewModel : ObservableObject
     }
 
     // Gets 0.5s of data at a time from consumer architecture
-    private void ReadPackets(List<List<double>> columns)//() 
+    private void ReadPackets()//List<List<double>> columns)//() 
     {
         int calls = 0;
         int val = 0;
@@ -638,13 +584,7 @@ partial class MainViewModel : ObservableObject
             double[] unusedDACData = null;
             try
             {
-
-                //takenData = columns[val].ToArray();  // to read waveform data from csv files
-                //unusedDACData = readBuff.Take(); // get DAC data then do nothing with it
-
                 takenData = readBuff.Take(); // gets waveform data from DAC buffer
-
-                
             }
             catch (InvalidOperationException) { }
             if (takenData != null)

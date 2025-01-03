@@ -439,7 +439,7 @@ partial class MainViewModel : ObservableObject
     public void PlayData() // Send packets
     {
 
-        ModemProgram.secretCarrierFrequency = 300000;// SecretCarrierFrequency;
+        ModemProgram.secretCarrierFrequency = 100000;// SecretCarrierFrequency;
         ModemProgram.globalStopped = false;
         PlotData.YValues.Clear(); // reset anything that could be read
         waveBuff = new BlockingCollection<float[]>();

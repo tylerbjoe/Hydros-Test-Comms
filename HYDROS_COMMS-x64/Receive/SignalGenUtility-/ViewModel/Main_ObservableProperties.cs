@@ -21,10 +21,10 @@ partial class MainViewModel : ObservableObject
     DefaultLinePlotViewModel _DefaultLinePlotViewModel;
 
     [ObservableProperty]
-    private string _DataFilePath = "C:\\Users\\AEngel\\Documents\\laura_testing_things\\test0.csv";
+    private string _DataFilePath = "C:\\Users\\TJoe\\Documents\\1_8_pooltest\\test0.csv";
 
     [ObservableProperty]
-    private string _LogFilePath = "C:\\Users\\AEngel\\Documents\\laura_testing_things\\testingLog.txt";
+    private string _LogFilePath = "C:\\Users\\TJoe\\Documents\\1_8_pooltest\\testingLog.txt";
 
     [ObservableProperty]
     public int _secretCarrierFrequency = 100_000;
