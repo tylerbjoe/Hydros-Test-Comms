@@ -782,7 +782,7 @@ public sealed class NIDAQController
         // add parameters
         //amp = (amp+dc_offset < 0.26) ? 0.26 : amp;
         //amp = (amp+dc_offset > 4.5) ? 4.5 : amp;
-        aoTask.AOChannels.CreateVoltageChannel(chId, "", -5, 5, AOVoltageUnits.Volts);
+        aoTask.AOChannels.CreateVoltageChannel(chId, "", -10, 10, AOVoltageUnits.Volts);
 
         if (regenerate)
             aoTask.Stream.WriteRegenerationMode = WriteRegenerationMode.AllowRegeneration; // allows buffer to be regenerated

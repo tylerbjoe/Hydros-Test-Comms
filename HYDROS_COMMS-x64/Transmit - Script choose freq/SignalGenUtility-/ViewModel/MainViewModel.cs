@@ -211,7 +211,7 @@ partial class MainViewModel : ObservableObject
                 waveCalls++;
             }
               
-            if (waveCalls == 50)
+            if (waveCalls == ModemProgram.numPackets)
             {
                 cts2.Cancel();
                 break;
@@ -438,8 +438,11 @@ partial class MainViewModel : ObservableObject
     [RelayCommand]
     public void PlayData() // Send packets
     {
+        ModemProgram.numPackets = 50; // number of packets to send
+        ModemProgram.secretCarrierFrequency = 100000; // Carrier Frequency;
+        ModemProgram.voltageAmplitude = 10; // +/- voltageAmplitude is the max/min waveform voltages
 
-        ModemProgram.secretCarrierFrequency = 100000;// SecretCarrierFrequency;
+
         ModemProgram.globalStopped = false;
         PlotData.YValues.Clear(); // reset anything that could be read
         waveBuff = new BlockingCollection<float[]>();

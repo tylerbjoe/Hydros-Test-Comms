@@ -37,7 +37,8 @@ namespace DelsysSigNIalGen
         public static bool globalStopped = false;
         public static int trialNum = 0; // Changes names of files
         public static int secretCarrierFrequency = -1; // Carrier frequency in Hz, for across the water // Will be set by on-screen input
-
+        public static int numPackets = 50;
+        public static float voltageAmplitude = 10; // +/- voltageAmplitude is max/min voltage waves are sent at
 
 
 
@@ -68,7 +69,7 @@ namespace DelsysSigNIalGen
             //}
 
             // Add to log
-            using (StreamWriter sw = new StreamWriter($"C:\\Users\\TJoe\\Documents\\outputLogs\\outputLog_{trialNum}.txt", true))
+            using (StreamWriter sw = new StreamWriter($"C:\\Users\\TJoe\\Documents\\1_8_pooltest\\txoutputLog_{trialNum}.txt", true)) // Saves incoming messages from modem to txt file
             {
                 sw.WriteLine(response);
             }
@@ -246,7 +247,7 @@ namespace DelsysSigNIalGen
                 
 
                 // There are currently csvs for 0-179 values. Reset after reaching the end.
-                if (calls == 150 || calls == 250 || calls == 350)
+                if (calls == (ModemProgram.secretCarrierFrequency / 1000) + ModemProgram.numPackets)
                 {
                     cts.Cancel(); // Cancel the task gracefully after 50 calls
                     break;
@@ -546,8 +547,9 @@ namespace DelsysSigNIalGen
                 float inputMax = sigout.Max();
 
                 // Define output range (+5V to -5V)
-                float outputMin = -5f; // -5f
-                float outputMax = 5f; // 5f
+                float outputMax = ModemProgram.voltageAmplitude; // 5f
+                float outputMin = -outputMax; // -5f
+                
 
                 // Linearly scale the values
                 float[] scaledValues = new float[sigout.Length];
@@ -738,6 +740,10 @@ namespace DelsysSigNIalGen
         static float Map(float value, float inputMin, float inputMax, float outputMin, float outputMax)
         {
             return outputMin + (outputMax - outputMin) * ((value - inputMin) / (inputMax - inputMin));
+
+            //return outputMax * (2 * ((value - inputMin) / (inputMax - inputMin)) - 1);
+
+
         }
     }
 }
