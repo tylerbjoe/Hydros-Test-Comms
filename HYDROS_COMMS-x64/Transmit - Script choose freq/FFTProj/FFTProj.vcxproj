@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>C:\Software\Hydros\MA-Transmit\HYDROS_COMMS-x64\Transmit\SignalGenUtility-\bin\Debug\net8.0-windows</OutDir>
+    <OutDir>C:\Software\Hydros\MA-Transmit\HYDROS_COMMS-x64\Transmit - Script choose freq\SignalGenUtility-\bin\Debug\net8.0-windows</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>C:\Users\AEngel\Desktop\SignalGenUtility-\bin\Debug\net8.0-windows</OutDir>
@@ -117,13 +117,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Software\Hydros\MA-Transmit\HYDROS_COMMS-x64\Transmit\SignalGenUtility-\include</AdditionalIncludeDirectories>
-      <AdditionalUsingDirectories>C:\Software\Hydros\MA-Transmit\HYDROS_COMMS-x64\Transmit\SignalGenUtility-\include</AdditionalUsingDirectories>
+      <AdditionalIncludeDirectories>C:\Software\Hydros\MA-Transmit\HYDROS_COMMS-x64\Transmit - Script choose freq\SignalGenUtility-\include</AdditionalIncludeDirectories>
+      <AdditionalUsingDirectories>C:\Software\Hydros\MA-Transmit\HYDROS_COMMS-x64\Transmit - Script choose freq\SignalGenUtility-\include</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Software\Hydros\MA-Transmit\HYDROS_COMMS-x64\Transmit\SignalGenUtility-\include</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Software\Hydros\MA-Transmit\HYDROS_COMMS-x64\Transmit - Script choose freq\SignalGenUtility-\include</AdditionalLibraryDirectories>
       <AdditionalDependencies>libfftw3-3.lib;libfftw3f-3.lib;libfftw3l-3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
