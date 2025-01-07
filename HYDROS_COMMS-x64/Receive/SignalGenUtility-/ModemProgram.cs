@@ -420,7 +420,7 @@ namespace DelsysSigNIalGen
         public static float[] DownsampleDownshift(double[] sigin, int calls)
         {
             //SAVE INPUT
-            //SaveArrayToCsv("C:/Users/TJoe/Documents/Comms Intermmediate Outputs/rx.csv", sigin);
+            SaveArrayToCsv("C:/Users/TJoe/Documents/1_8_pooltest/rx.csv", sigin);
             float fs_down = 102_400; // changed 102_400
             float fc_down = 35_000;
             float fs_bef = 1_000_000;
@@ -443,7 +443,7 @@ namespace DelsysSigNIalGen
             //{
             //    realComponents[i] = resampled[i].Real;
             //}
-            //SaveArrayToCsv("C:/Users/TJoe/Documents/Comms Intermmediate Outputs/rxds.csv", realComponents);
+            //SaveArrayToCsv("C:/Users/TJoe/Documents/1_8_pooltest/rxds.csv", realComponents);
 
             // Undo modulate to baseband (go back to Popoto passband)
             int resampledLen = resampled.Length;
@@ -453,13 +453,13 @@ namespace DelsysSigNIalGen
                 double bb_factor = 2 * Math.PI * fc_down * (i + 1) / fs_down; // +1 to match np.arange start @ 1
                 no_bb[i] = resampled[i] * Complex.Exp(new Complex(0, bb_factor));
             }
-            // SAVE BB REAL COMPONENTS
-            double[] realComponentss = new double[no_bb.Length];
+            // SAVE downsampled REAL COMPONENTS
+            //double[] realComponentss = new double[no_bb.Length];
             //for (int i = 0; i < no_bb.Length; i++)
             //{
             //    realComponentss[i] = no_bb[i].Real;
             //}
-            //SaveArrayToCsv("C:/Users/TJoe/Documents/Comms Intermmediate Outputs/rxnbb.csv", realComponentss);
+            //SaveArrayToCsv("C:/Users/TJoe/Documents/1_8_pooltest/rxdsdsimag.csv", realComponentss);
 
             // Subtract imag component from real component
             float[] sigout = new float[no_bb.Length];
@@ -468,7 +468,7 @@ namespace DelsysSigNIalGen
                 sigout[i] = (float)(no_bb[i].Real - no_bb[i].Imaginary);
             }
             // SAVE DOWNSHIFT
-            //SaveArrayToCsv("C:/Users/TJoe/Documents/Comms Intermmediate Outputs/rxdsds.csv", sigout);
+            SaveArrayToCsv("C:/Users/TJoe/Documents/1_8_pooltest/rxdsds.csv", sigout);
 
             return sigout; // s(t) in popoto passband
         }

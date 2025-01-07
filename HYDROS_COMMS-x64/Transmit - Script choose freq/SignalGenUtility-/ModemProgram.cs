@@ -37,7 +37,7 @@ namespace DelsysSigNIalGen
         public static bool globalStopped = false;
         public static int trialNum = 0; // Changes names of files
         public static int secretCarrierFrequency = -1; // Carrier frequency in Hz, for across the water // Will be set by on-screen input
-        public static int numPackets = 50;
+        public static int numPackets = 50; // Change number of packets being sent
         public static float voltageAmplitude = 10; // +/- voltageAmplitude is max/min voltage waves are sent at
 
 

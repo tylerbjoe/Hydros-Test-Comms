@@ -65,7 +65,6 @@ namespace DelsysSigNIalGen
 
             // Add to log
             using (StreamWriter sw = new StreamWriter($"C:\\Users\\TJoe\\Documents\\outputLogs\\outputLog_{trialNum}.txt", true))
-            //using (StreamWriter sw = new StreamWriter(logPath, true)) // appends = true here UNCOMMENT FOR LINE BEFORE PREVIOUSLY
             {
                 sw.WriteLine(response);
             }
