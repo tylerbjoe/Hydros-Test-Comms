@@ -420,7 +420,7 @@ namespace DelsysSigNIalGen
         public static float[] DownsampleDownshift(double[] sigin, int calls)
         {
             //SAVE INPUT
-            SaveArrayToCsv("C:/Users/TJoe/Documents/1_8_pooltest/rx.csv", sigin);
+            //SaveArrayToCsv("C:/Users/TJoe/Documents/1_8_pooltest/rx.csv", sigin);
             float fs_down = 102_400; // changed 102_400
             float fc_down = 35_000;
             float fs_bef = 1_000_000;

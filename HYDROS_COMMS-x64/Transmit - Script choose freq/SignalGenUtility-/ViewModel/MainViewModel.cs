@@ -226,7 +226,7 @@ partial class MainViewModel : ObservableObject
         AOSampleRate = 1_000_000; // Hz
 
         // Send to transducer over TF.PIN.#
-        _ff.StartGeneratedSignalFromFloatArray(Hw.GetPinAddress(TF_PIN.AO0), takenData, AOSampleRate, false);
+        _ff.StartGeneratedSignalFromFloatArray(Hw.GetPinAddress(TF_PIN.AO0), Hw.GetPinAddress(TF_PIN.AO1), takenData, AOSampleRate, false);
         ZoomExtents = true;
 
         double durationMs = takenData.Length / 1_000; // This works for AOSampleRate of 1MHz
@@ -234,6 +234,7 @@ partial class MainViewModel : ObservableObject
 
         // Make the transducer continue the same last value (should be 0) until next signal is received
         _ff.StopGeneratedSignal(Hw.GetPinAddress(TF_PIN.AO0));
+        _ff.StopGeneratedSignal(Hw.GetPinAddress(TF_PIN.AO1));
     }
 
     public void Timerfunction(object state)
@@ -438,9 +439,9 @@ partial class MainViewModel : ObservableObject
     [RelayCommand]
     public void PlayData() // Send packets
     {
-        ModemProgram.numPackets = 50; // number of packets to send
+        ModemProgram.numPackets = 10; // number of packets to send
         ModemProgram.secretCarrierFrequency = 100000; // Carrier Frequency;
-        ModemProgram.voltageAmplitude = 10; // +/- voltageAmplitude is the max/min waveform voltages
+        ModemProgram.voltageAmplitude = 1; // +/- voltageAmplitude is the max/min waveform voltages
 
 
         ModemProgram.globalStopped = false;
@@ -494,7 +495,7 @@ partial class MainViewModel : ObservableObject
                 }
                 PlotData.Clear();
                 StartNICard();
-                _ff.StartGeneratedSignalFromFloatArray(Hw.GetPinAddress(TF_PIN.AO0), scaledValues, AOSampleRate, false);
+                //_ff.StartGeneratedSignalFromFloatArray(Hw.GetPinAddress(TF_PIN.AO0), scaledValues, AOSampleRate, false);
                 ZoomExtents = true;
                 Task.Delay(length * 1000).Wait();
                 _ff.StopGeneratedSignal(Hw.GetPinAddress(TF_PIN.AO0));
@@ -535,7 +536,7 @@ partial class MainViewModel : ObservableObject
             {
                 scaledValues[i] = Map(floatArray[i], inputMin, inputMax, outputMin, outputMax);
             }
-            _ff.StartGeneratedSignalFromFloatArray(Hw.GetPinAddress(TF_PIN.AO0), scaledValues, AOSampleRate, true);
+            //_ff.StartGeneratedSignalFromFloatArray(Hw.GetPinAddress(TF_PIN.AO0), scaledValues, AOSampleRate, true);
         }
         else
         {

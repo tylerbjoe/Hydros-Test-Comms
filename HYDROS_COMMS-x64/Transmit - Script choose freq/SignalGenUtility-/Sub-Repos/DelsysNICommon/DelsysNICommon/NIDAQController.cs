@@ -578,6 +578,7 @@ public sealed class NIDAQController
         DAQmx.Task aoTask = new DAQmx.Task();
         TaskList.Add(taskName, aoTask);
 
+
         aoTask.AOChannels.CreateVoltageChannel($"{DaqDevice.DeviceID}/ao0", "", -10, 10, AOVoltageUnits.Volts);
 
         aoTask.Timing.ConfigureSampleClock("", sampleRate, SampleClockActiveEdge.Rising, SampleQuantityMode.ContinuousSamples);
@@ -805,9 +806,64 @@ public sealed class NIDAQController
 
         //write data to buffer
         double[] dblData = Array.ConvertAll(data, x => (double)x);
-        writer.WriteMultiSample(false, dblData);
+        writer.WriteMultiSample(false,dblData);
         aoTask.Start();
     }
+
+    public void StartFunctionFromFloatArrayTwo(string pinName, string pinName2, float[] data, double clkRate, bool regenerate)
+    {
+        TaskList.TryGetValue(pinName, out DAQmx.Task doTask);
+        if (doTask != null)
+            StopGenerateFunction(pinName);
+
+        var chId = Part.PinNameToID[pinName];
+        DAQmx.Task aoTask = new DAQmx.Task();
+        TaskList.Add(pinName, aoTask);
+
+        // add parameters
+        //amp = (amp+dc_offset < 0.26) ? 0.26 : amp;
+        //amp = (amp+dc_offset > 4.5) ? 4.5 : amp;
+        var foo = chId + "," + Part.PinNameToID[pinName2];
+        aoTask.AOChannels.CreateVoltageChannel(foo, "", -10, 10, AOVoltageUnits.Volts);
+
+        if (regenerate)
+            aoTask.Stream.WriteRegenerationMode = WriteRegenerationMode.AllowRegeneration; // allows buffer to be regenerated
+        else
+            aoTask.Stream.WriteRegenerationMode = WriteRegenerationMode.DoNotAllowRegeneration; // prevents buffer from being regenerated
+
+        aoTask.Control(TaskAction.Verify);
+        aoTask.Control(TaskAction.Commit);
+        aoTask.Control(TaskAction.Unreserve);
+        aoTask.Timing.SampleClockRate = clkRate;
+
+        aoTask.Timing.ConfigureSampleClock("",
+                                           aoTask.Timing.SampleClockRate,
+                                           SampleClockActiveEdge.Rising,
+                                           SampleQuantityMode.ContinuousSamples, data.Length);
+
+
+        AnalogMultiChannelWriter writer =
+         new AnalogMultiChannelWriter(aoTask.Stream);
+
+        //write data to buffer
+        double[] dblData = Array.ConvertAll(data, x => (double)x);
+        var newData = ConvertTo2DArray(dblData, 2, dblData.Length - 1);
+        writer.WriteMultiSample(false, newData);
+        aoTask.Start();
+    }
+    public double[,] ConvertTo2DArray(double[] data, int rows, int cols)
+    {
+        double[,] result = new double[rows, data.Length]; 
+        
+        for (int i = 0; i < data.Length-1; i++)
+        {
+            result[0, i] = data[i];
+            result[1, i] = data[i]*2.0;
+        }
+        return result;
+    }
+
+
     public void StartGenerateFunction(string pinName, WaveformType type, double freq, double amp, double clkRate, int samplesPerBuffer, double dc_offset = 0.0)
     {
         TaskList.TryGetValue(pinName, out DAQmx.Task doTask);

@@ -77,7 +77,7 @@
     <OutDir>C:\Software\HYDROS_COMMS-Andrew\Receive\SignalGenUtility-\bin\Debug\net8.0-windows</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>..\SignalGenUtility-\bin\Release\net8.0-windows</OutDir>
+    <OutDir>C:\Software\Hydros\MA-Transmit\HYDROS_COMMS-x64\Receive\SignalGenUtility-\bin\Release\net8.0-windows</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

@@ -76,9 +76,19 @@ namespace DelsysTestLib.NIDAQ
             DAQ.StartGenerateFunction(pin, waveformType, frequency, pk_pk / 2.0, 2_000_000, 2_000_000, dc_offset);
             Task.Delay(100);
         }
-        public void StartGeneratedSignalFromFloatArray(string pin, float[] data, int outFreq, bool regeneration)
+        public void StartGeneratedSignalFromFloatArray(string pin, string pin2, float[] data, int outFreq, bool regeneration)
         {
-            DAQ.StartFunctionFromFloatArray(pin, data, outFreq, regeneration); // 44.1kHz is the most common .wav file sample rate
+            try
+            {
+                DAQ.StartFunctionFromFloatArrayTwo(pin, pin2, data, outFreq, regeneration); // 44.1kHz is the most common .wav file sample rate
+
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex);
+                Trace.WriteLine(ex);
+            }
+
             Task.Delay(100);
         }
 
