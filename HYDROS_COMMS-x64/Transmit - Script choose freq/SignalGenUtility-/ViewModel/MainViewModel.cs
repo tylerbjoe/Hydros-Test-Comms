@@ -443,12 +443,12 @@ partial class MainViewModel : ObservableObject
     [RelayCommand]
     public void PlayData() // Send packets
     {
-        ModemProgram.numPackets = 10; // number of packets to send
+        ModemProgram.numPackets = 50; // number of packets to send
         ModemProgram.secretCarrierFrequency = 100000; // Carrier Frequency;
-        ModemProgram.secretCarrierFrequency = 200000; // Carrier Frequency;
+        ModemProgram.secretCarrierFrequency2 = 300000; // Carrier Frequency;
 
         ModemProgram.voltageAmplitude = 1; // +/- voltageAmplitude is the max/min waveform voltages
-
+        ModemProgram.voltageAmplitude2 = 3; // +/- voltageAmplitude is the max/min waveform voltages
 
         ModemProgram.globalStopped = false;
         PlotData.YValues.Clear(); // reset anything that could be read
@@ -458,10 +458,6 @@ partial class MainViewModel : ObservableObject
         // Generate encoded waveforms
         CancellationTokenSource cts = new CancellationTokenSource();
         Task.Run(() => ModemProgram.GetVals(stream, pcmStream, waveBuff, waveBuff2, cts));
-
-        //ModemProgram.secretCarrierFrequency = 200000; // Carrier Frequency;
-        //CancellationTokenSource cts2 = new CancellationTokenSource();
-        //Task.Run(() => ModemProgram.GetVals(stream, pcmStream, waveBuff2, cts2));
 
         // Generate Wave Buff
         CancellationTokenSource cts3 = new CancellationTokenSource();

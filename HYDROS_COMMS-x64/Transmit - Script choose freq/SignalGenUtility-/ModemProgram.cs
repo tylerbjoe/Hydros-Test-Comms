@@ -38,9 +38,9 @@ namespace DelsysSigNIalGen
         public static int trialNum = 0; // Changes names of files
         public static int secretCarrierFrequency = -1; // Carrier frequency in Hz, for across the water // Will be set by on-screen input
         public static int secretCarrierFrequency2 = -1; // Carrier frequency in Hz, for across the water // Will be set by on-screen input
-        public static int numPackets = 50; // Change number of packets being sent
-        public static float voltageAmplitude = 10; // +/- voltageAmplitude is max/min voltage waves are sent at
-
+        public static int numPackets; // Change number of packets being sent
+        public static float voltageAmplitude; // +/- voltageAmplitude is max/min voltage waves are sent at
+        public static float voltageAmplitude2; // +/- voltageAmplitude is max/min voltage waves are sent at
 
 
         // Receive control messages from modem
@@ -244,9 +244,9 @@ namespace DelsysSigNIalGen
             {
                 //Thread.Sleep(200); // for debugging non-real time, should pause a bit
                 (int hr, int spo2) = getNextVals(calls);
-                RunModemProgram(hr, spo2, stream, pcmStream, calls, waveBuff);
+                RunModemProgram(hr, spo2, stream, pcmStream, calls, waveBuff, ModemProgram.secretCarrierFrequency, ModemProgram.voltageAmplitude);
                 (int hr2, int spo22) = getNextVals(calls2);
-                RunModemProgram(hr2, spo22, stream, pcmStream, calls, waveBuff2);
+                RunModemProgram(hr2, spo22, stream, pcmStream, calls, waveBuff2, ModemProgram.secretCarrierFrequency2, ModemProgram.voltageAmplitude2);
                 calls++;
                 
 
@@ -308,7 +308,7 @@ namespace DelsysSigNIalGen
         }
 
         // Send the data and get the encoded waveform
-        public static void RunModemProgram(int heart_rate, int spo2, NetworkStream stream, NetworkStream pcmStream, int calls, BlockingCollection<float[]> waveBuff)
+        public static void RunModemProgram(int heart_rate, int spo2, NetworkStream stream, NetworkStream pcmStream, int calls, BlockingCollection<float[]> waveBuff, int scf, float voltAmp)
         {
             // Send TransmitJSON message and pump 5s zero waveform
             sendData(heart_rate, spo2, 0, stream);
@@ -364,7 +364,7 @@ namespace DelsysSigNIalGen
             // Save cutArray to CSV
             //SaveArrayToCsv("C:/Users/TJoe/Documents/Comms Intermmediate Outputs/txencoded.csv", cutArray);
 
-            UpsampleUpshift(cutArray, waveBuff, calls);
+            UpsampleUpshift(cutArray, waveBuff, calls, scf, voltAmp);
         }
 
 
@@ -486,12 +486,12 @@ namespace DelsysSigNIalGen
             return result;
         }
 
-        public static void UpsampleUpshift(float[] sigin, BlockingCollection<float[]> waveBuff, int calls, bool down_next = false)
+        public static void UpsampleUpshift(float[] sigin, BlockingCollection<float[]> waveBuff, int calls, int scf, float voltAmp, bool down_next = false)
         {
             float fs_og = 102_400;
             float fc_og = 35_000;
             float fs_up = 1_000_000;
-            float fc_up = secretCarrierFrequency;
+            float fc_up = scf;
 
             // Modulate to baseband
             int sigLen = sigin.Length;
@@ -550,7 +550,7 @@ namespace DelsysSigNIalGen
                 float inputMax = sigout.Max();
 
                 // Define output range (+5V to -5V)
-                float outputMax = ModemProgram.voltageAmplitude; // 5f
+                float outputMax = voltAmp; // 5f
                 float outputMin = -outputMax; // -5f
                 
 
