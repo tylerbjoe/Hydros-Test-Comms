@@ -35,6 +35,7 @@ using System.Windows.Media.Imaging;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using static CommunityToolkit.Mvvm.ComponentModel.__Internals.__TaskExtensions.TaskAwaitableWithoutEndValidation;
 using ControlzEx.Standard;
+using DelsysSigNIalGen;
 
 namespace DelsysSigNIalGen.ViewModel;
 
@@ -54,6 +55,7 @@ partial class MainViewModel : ObservableObject
     NetworkStream stream;
     NetworkStream pcmStream;
     BlockingCollection<float[]> waveBuff = new BlockingCollection<float[]>();
+    BlockingCollection<float[]> waveBuff2 = new BlockingCollection<float[]>();
     BlockingCollection<double[]> readBuff = new BlockingCollection<double[]>();
 
     public MainViewModel()
@@ -184,20 +186,22 @@ partial class MainViewModel : ObservableObject
     }
 
     // Wait to get the encoded waveforms from the modem
-    public async Task GetWaveBuff(CancellationTokenSource cts2)
+    public async Task GetWaveBuff(CancellationTokenSource cts3)
     {
         int waveCalls = 0;
 
-        while (!ModemProgram.globalStopped && !cts2.Token.IsCancellationRequested)
+        while (!ModemProgram.globalStopped && !cts3.Token.IsCancellationRequested)
         {
             float[] takenData = null;
+            float[] takenData2 = null;
             try
             {
                 takenData = waveBuff.Take(); // See if data loaded in
+                takenData2 = waveBuff2.Take(); // See if data loaded in
             }
             catch (InvalidOperationException) { }
 
-            if (takenData != null)
+            if (takenData != null & takenData2 != null)
             {
                 // First data starts the whole program
                 if (waveCalls == 0)
@@ -206,14 +210,14 @@ partial class MainViewModel : ObservableObject
                     PlotData.Clear();
                     StartNICard();
                 }
-                Trace.WriteLine($"Added waveform #{waveCalls}!");
-                TransmitWave(takenData);
+                Trace.WriteLine($"Added waveforms #{waveCalls}!");
+                TransmitWave(takenData,takenData2);
                 waveCalls++;
             }
               
             if (waveCalls == ModemProgram.numPackets)
             {
-                cts2.Cancel();
+                cts3.Cancel();
                 break;
             }
         }
@@ -221,12 +225,12 @@ partial class MainViewModel : ObservableObject
     }
 
     // Send loaded signal to transducer
-    public void TransmitWave(float[] takenData)
+    public void TransmitWave(float[] takenData, float[] takenData2)
     {
         AOSampleRate = 1_000_000; // Hz
 
         // Send to transducer over TF.PIN.#
-        _ff.StartGeneratedSignalFromFloatArray(Hw.GetPinAddress(TF_PIN.AO0), Hw.GetPinAddress(TF_PIN.AO1), takenData, AOSampleRate, false);
+        _ff.StartGeneratedSignalFromFloatArray(Hw.GetPinAddress(TF_PIN.AO0), Hw.GetPinAddress(TF_PIN.AO1), takenData, takenData2, AOSampleRate, false);
         ZoomExtents = true;
 
         double durationMs = takenData.Length / 1_000; // This works for AOSampleRate of 1MHz
@@ -441,19 +445,27 @@ partial class MainViewModel : ObservableObject
     {
         ModemProgram.numPackets = 10; // number of packets to send
         ModemProgram.secretCarrierFrequency = 100000; // Carrier Frequency;
+        ModemProgram.secretCarrierFrequency = 200000; // Carrier Frequency;
+
         ModemProgram.voltageAmplitude = 1; // +/- voltageAmplitude is the max/min waveform voltages
 
 
         ModemProgram.globalStopped = false;
         PlotData.YValues.Clear(); // reset anything that could be read
         waveBuff = new BlockingCollection<float[]>();
+        waveBuff2 = new BlockingCollection<float[]>();
 
         // Generate encoded waveforms
         CancellationTokenSource cts = new CancellationTokenSource();
-        Task.Run(() => ModemProgram.GetVals(stream, pcmStream, waveBuff, cts));
-        // Once encoded, send to transducer
-        CancellationTokenSource cts2 = new CancellationTokenSource();
-        Task.Run(() => GetWaveBuff(cts2));
+        Task.Run(() => ModemProgram.GetVals(stream, pcmStream, waveBuff, waveBuff2, cts));
+
+        //ModemProgram.secretCarrierFrequency = 200000; // Carrier Frequency;
+        //CancellationTokenSource cts2 = new CancellationTokenSource();
+        //Task.Run(() => ModemProgram.GetVals(stream, pcmStream, waveBuff2, cts2));
+
+        // Generate Wave Buff
+        CancellationTokenSource cts3 = new CancellationTokenSource();
+        Task.Run(() => GetWaveBuff(cts3));
     }
 
 

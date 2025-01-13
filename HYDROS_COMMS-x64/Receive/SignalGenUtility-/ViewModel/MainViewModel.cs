@@ -590,7 +590,7 @@ partial class MainViewModel : ObservableObject
             if (takenData != null)
             {
                 // Downsample first
-                Debug.WriteLine("ReadPackets Called", calls);
+                //Debug.WriteLine("ReadPackets Called", calls);
                 float[] dfDowned = ModemProgram.DownsampleDownshift(takenData, calls);
 
                 // Send downsampled wave data to modem

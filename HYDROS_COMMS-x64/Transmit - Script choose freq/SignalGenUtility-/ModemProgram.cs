@@ -37,6 +37,7 @@ namespace DelsysSigNIalGen
         public static bool globalStopped = false;
         public static int trialNum = 0; // Changes names of files
         public static int secretCarrierFrequency = -1; // Carrier frequency in Hz, for across the water // Will be set by on-screen input
+        public static int secretCarrierFrequency2 = -1; // Carrier frequency in Hz, for across the water // Will be set by on-screen input
         public static int numPackets = 50; // Change number of packets being sent
         public static float voltageAmplitude = 10; // +/- voltageAmplitude is max/min voltage waves are sent at
 
@@ -235,18 +236,21 @@ namespace DelsysSigNIalGen
         }
 
         // Get the hr&spo2 values from CSVs
-        public static async Task GetVals(NetworkStream stream, NetworkStream pcmStream, BlockingCollection<float[]> waveBuff, CancellationTokenSource cts)
+        public static async Task GetVals(NetworkStream stream, NetworkStream pcmStream, BlockingCollection<float[]> waveBuff, BlockingCollection<float[]> waveBuff2, CancellationTokenSource cts)
         {
             int calls = ModemProgram.secretCarrierFrequency / 1000;
+            int calls2 = ModemProgram.secretCarrierFrequency2 / 1000;
             while (!cts.Token.IsCancellationRequested)  // Check for cancellation request
             {
                 //Thread.Sleep(200); // for debugging non-real time, should pause a bit
                 (int hr, int spo2) = getNextVals(calls);
                 RunModemProgram(hr, spo2, stream, pcmStream, calls, waveBuff);
+                (int hr2, int spo22) = getNextVals(calls2);
+                RunModemProgram(hr2, spo22, stream, pcmStream, calls, waveBuff2);
                 calls++;
                 
 
-                // There are currently csvs for 0-179 values. Reset after reaching the end.
+                // There are currently csvs for 0-1000 values. Reset after reaching the end.
                 if (calls == (ModemProgram.secretCarrierFrequency / 1000) + ModemProgram.numPackets)
                 {
                     cts.Cancel(); // Cancel the task gracefully after 50 calls
@@ -484,7 +488,6 @@ namespace DelsysSigNIalGen
 
         public static void UpsampleUpshift(float[] sigin, BlockingCollection<float[]> waveBuff, int calls, bool down_next = false)
         {
-            
             float fs_og = 102_400;
             float fc_og = 35_000;
             float fs_up = 1_000_000;

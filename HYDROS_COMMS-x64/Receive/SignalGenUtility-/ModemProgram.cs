@@ -468,7 +468,7 @@ namespace DelsysSigNIalGen
                 sigout[i] = (float)(no_bb[i].Real - no_bb[i].Imaginary);
             }
             // SAVE DOWNSHIFT
-            SaveArrayToCsv("C:/Users/TJoe/Documents/1_8_pooltest/rxdsds.csv", sigout);
+            //SaveArrayToCsv("C:/Users/TJoe/Documents/1_8_pooltest/rxdsds.csv", sigout);
 
             return sigout; // s(t) in popoto passband
         }

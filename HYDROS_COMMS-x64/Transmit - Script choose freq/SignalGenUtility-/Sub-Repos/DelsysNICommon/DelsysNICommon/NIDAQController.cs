@@ -810,7 +810,7 @@ public sealed class NIDAQController
         aoTask.Start();
     }
 
-    public void StartFunctionFromFloatArrayTwo(string pinName, string pinName2, float[] data, double clkRate, bool regenerate)
+    public void StartFunctionFromFloatArrayTwo(string pinName, string pinName2, float[] data, float[] data2, double clkRate, bool regenerate)
     {
         TaskList.TryGetValue(pinName, out DAQmx.Task doTask);
         if (doTask != null)
@@ -847,18 +847,19 @@ public sealed class NIDAQController
 
         //write data to buffer
         double[] dblData = Array.ConvertAll(data, x => (double)x);
-        var newData = ConvertTo2DArray(dblData, 2, dblData.Length - 1);
+        double[] dblData2 = Array.ConvertAll(data2, x => (double)x);
+        var newData = ConvertTo2DArray(dblData, dblData2, 2, dblData.Length - 1);
         writer.WriteMultiSample(false, newData);
         aoTask.Start();
     }
-    public double[,] ConvertTo2DArray(double[] data, int rows, int cols)
+    public double[,] ConvertTo2DArray(double[] data, double[] data2, int rows, int cols)
     {
         double[,] result = new double[rows, data.Length]; 
         
         for (int i = 0; i < data.Length-1; i++)
         {
             result[0, i] = data[i];
-            result[1, i] = data[i]*2.0;
+            result[1, i] = data2[i];
         }
         return result;
     }
