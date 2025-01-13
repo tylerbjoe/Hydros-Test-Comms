@@ -445,7 +445,7 @@ partial class MainViewModel : ObservableObject
     {
         ModemProgram.numPackets = 50; // number of packets to send
         ModemProgram.secretCarrierFrequency = 100000; // Carrier Frequency;
-        ModemProgram.secretCarrierFrequency2 = 300000; // Carrier Frequency;
+        ModemProgram.secretCarrierFrequency2 = 150000; // Carrier Frequency;
 
         ModemProgram.voltageAmplitude = 1; // +/- voltageAmplitude is the max/min waveform voltages
         ModemProgram.voltageAmplitude2 = 3; // +/- voltageAmplitude is the max/min waveform voltages

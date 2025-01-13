@@ -248,6 +248,7 @@ namespace DelsysSigNIalGen
                 (int hr2, int spo22) = getNextVals(calls2);
                 RunModemProgram(hr2, spo22, stream, pcmStream, calls, waveBuff2, ModemProgram.secretCarrierFrequency2, ModemProgram.voltageAmplitude2);
                 calls++;
+                calls2++;
                 
 
                 // There are currently csvs for 0-1000 values. Reset after reaching the end.
