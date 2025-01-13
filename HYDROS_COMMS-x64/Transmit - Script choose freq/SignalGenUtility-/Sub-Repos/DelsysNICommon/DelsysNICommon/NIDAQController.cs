@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Threading;
 using static System.Net.Mime.MediaTypeNames;
 using DAQmx = NationalInstruments.DAQmx;
@@ -854,8 +855,9 @@ public sealed class NIDAQController
     }
     public double[,] ConvertTo2DArray(double[] data, double[] data2, int rows, int cols)
     {
-        double[,] result = new double[rows, data.Length]; 
-        
+        double[,] result = new double[rows, data.Length];
+
+
         for (int i = 0; i < data.Length-1; i++)
         {
             result[0, i] = data[i];
@@ -863,6 +865,13 @@ public sealed class NIDAQController
         }
         return result;
     }
+
+    public void SaveArrayToCsv(double[] data, string filePath)
+    {
+        var csvContent = string.Join(",", data.Select(d => d.ToString()));
+        System.IO.File.WriteAllText(filePath, csvContent);
+    }
+
 
 
     public void StartGenerateFunction(string pinName, WaveformType type, double freq, double amp, double clkRate, int samplesPerBuffer, double dc_offset = 0.0)
