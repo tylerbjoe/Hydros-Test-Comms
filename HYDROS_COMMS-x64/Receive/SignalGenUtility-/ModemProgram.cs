@@ -420,7 +420,7 @@ namespace DelsysSigNIalGen
         public static float[] DownsampleDownshift(double[] sigin, int calls)
         {
             //SAVE INPUT
-            SaveArrayToCsv("C:/Users/TJoe/Documents/1_8_pooltest/rx.csv", sigin);
+            //SaveArrayToCsv("C:/Users/TJoe/Documents/1_8_pooltest/rx.csv", sigin);
             float fs_down = 102_400; // changed 102_400
             float fc_down = 35_000;
             float fs_bef = 1_000_000;
@@ -468,7 +468,7 @@ namespace DelsysSigNIalGen
                 sigout[i] = (float)(no_bb[i].Real - no_bb[i].Imaginary);
             }
             // SAVE DOWNSHIFT
-            SaveArrayToCsv("C:/Users/TJoe/Documents/1_8_pooltest/rxdsds.csv", sigout);
+            //SaveArrayToCsv("C:/Users/TJoe/Documents/1_8_pooltest/rxdsds.csv", sigout);
 
             return sigout; // s(t) in popoto passband
         }

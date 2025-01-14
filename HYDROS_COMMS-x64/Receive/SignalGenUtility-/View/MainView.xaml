@@ -134,7 +134,7 @@
                                materialDesign:HintAssist.Hint="Channel "
                               Style="{StaticResource MaterialDesignOutlinedComboBox}"
                               Width="140"
-                                      SelectedIndex="9"
+                                      SelectedIndex="0"
                                       SelectedValue="{Binding AnalogInChannel}"
                                   ItemsSource="{Binding AI_Names}"
                                   Foreground="White"
