@@ -639,10 +639,10 @@ partial class MainViewModel : ObservableObject
             try
             {
 
-                //takenData = columns[val].ToArray();  // to read waveform data from csv files
-                //unusedDACData = readBuff.Take(); // get DAC data then do nothing with it
+                takenData = columns[val].ToArray();  // to read waveform data from csv files
+                unusedDACData = readBuff.Take(); // get DAC data then do nothing with it
 
-                takenData = readBuff.Take(); // gets waveform data from DAC buffer
+                //takenData = readBuff.Take(); // gets waveform data from DAC buffer
 
                 
             }
