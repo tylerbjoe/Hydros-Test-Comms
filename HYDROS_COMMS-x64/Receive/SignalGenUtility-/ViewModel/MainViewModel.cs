@@ -260,6 +260,32 @@ partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
+    public void ExportToBinary()
+    {
+        Trace.WriteLine("Exporting to binary file (32-bit float)");
+        var yValues = PlotData.YValues.ToArray();
+        SaveFileDialog saveDialog = new SaveFileDialog
+        {
+            Filter = "Binary file (*.bin)|*.bin|All Files (*.*)|*.*"
+        };
+        saveDialog.ShowDialog();
+        using (BinaryWriter writer = new BinaryWriter(File.Open(saveDialog.FileName, FileMode.Create)))
+        {
+            for (int i = 0; i < yValues.Length; i++)
+            {
+                if (i % 5_000_000 == 0)
+                {
+                    Trace.WriteLine($"Exported {i / 1_000_000} seconds");
+                }
+                writer.Write((float)yValues[i]); // Cast to float (32-bit)
+            }
+        }
+        Trace.WriteLine("Finished exporting to binary file (32-bit float)!");
+    }
+
+
+
+    [RelayCommand]
     public void ExportToCSV() // Note that this will only export the points the program still has in memory.
     {
         Trace.WriteLine("Exporting to CSV");

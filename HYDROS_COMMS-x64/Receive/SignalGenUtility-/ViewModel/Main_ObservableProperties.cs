@@ -21,7 +21,7 @@ partial class MainViewModel : ObservableObject
     DefaultLinePlotViewModel _DefaultLinePlotViewModel;
 
     [ObservableProperty]
-    private string _DataFilePath = "C:\\Users\\TJoe\\Documents\\1_8_pooltest\\test0.csv";
+    private string _DataFilePath = "C:\\Users\\TJoe\\Documents\\1_8_pooltest\\test0.bin";
 
     [ObservableProperty]
     private string _LogFilePath = "C:\\Users\\TJoe\\Documents\\1_8_pooltest\\testingLog.txt";
