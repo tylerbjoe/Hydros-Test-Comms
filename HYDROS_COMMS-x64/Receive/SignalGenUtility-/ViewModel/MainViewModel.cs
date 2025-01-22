@@ -161,7 +161,7 @@ partial class MainViewModel : ObservableObject
                 {
                     if (_ff.AIRead.DataBuffer.Count > 1)
                     {
-                        Trace.WriteLine("in queue " + _ff.AIRead.DataBuffer.Count);
+                        //Trace.WriteLine("in queue " + _ff.AIRead.DataBuffer.Count);
                     }
 
                     _ff.AIRead.DataBuffer.TryTake(out var item);
@@ -178,6 +178,7 @@ partial class MainViewModel : ObservableObject
                     if (currData.Count >= 500_000)
                     {
                         // Add 0.5 seconds of data to readBuff to be decoded
+                        //Debug.WriteLine("adding line to readBuff to decode");
                         readBuff.Add(currData.ToArray());
                         calls++;
                         currData.Clear();
@@ -413,61 +414,8 @@ partial class MainViewModel : ObservableObject
         {
             Task.Run(() => ModemProgram.decodeControls(streamDec));
         }
-        //BEGIN SIMULATED DATA
-        string filePath = "C:/Users/TJoe/Documents/Comms Intermmediate Outputs/txboosted50.csv";
-        List<List<double>> columns = new List<List<double>>();
-        using (StreamReader reader = new StreamReader(filePath))
-        {
-            string line;
+        Task.Run(() => ReadPackets());
 
-            // Skip the first row (header)
-            bool isHeader = true;
-            bool noEmpty = true;
-            while ((line = reader.ReadLine()) != null)
-            {
-                if (isHeader)
-                {
-                    isHeader = false;
-                    continue; // Skip processing the header row
-                }
-
-                // Split the line into values, assuming comma as the delimiter
-                string[] parts = line.Split(',');
-
-
-                foreach (string part in parts)
-                {
-                    if (part.IsEmpty())
-                    {
-                        noEmpty = false;
-                        Debug.WriteLine("empty detected!!!!!!!");
-                        break;
-                    }
-                }
-                if (!noEmpty)
-                {
-                    break;
-                }
-
-                // Ensure columns list is large enough to hold all values
-                while (columns.Count < parts.Length)
-                {
-                    columns.Add(new List<double>());
-                }
-
-                // Add each value to its corresponding column
-                for (int i = 0; i < parts.Length; i++)
-                {
-                    columns[i].Add(double.Parse(parts[i]));
-                }
-            }
-        }
-        for (int i = 0; i < columns.Count; i++)
-        {
-            ModemProgram.DownsampleDownshift(columns[i].ToArray(), 0);
-        }
-
-        Task.Run(() => ReadPackets(columns));
     }
 
     [RelayCommand]
@@ -628,41 +576,39 @@ partial class MainViewModel : ObservableObject
     }
 
     // Gets 0.5s of data at a time from consumer architecture
-    private void ReadPackets(List<List<double>> columns)//() 
+    private void ReadPackets()
     {
         int calls = 0;
-        int val = 0;
+
         while (!ModemProgram.globalStopped)
         {
             double[] takenData = null;
-            double[] unusedDACData = null;
             try
             {
-
-                takenData = columns[val].ToArray();  // to read waveform data from csv files
-                unusedDACData = readBuff.Take(); // get DAC data then do nothing with it
-
-                //takenData = readBuff.Take(); // gets waveform data from DAC buffer
-
-                
+                takenData = readBuff.Take();
             }
-            catch (InvalidOperationException) { }
+            catch (InvalidOperationException)
+            {
+                // Handle cases where readBuff.Take() throws an exception
+                Debug.WriteLine("Buffer operation failed.");
+            }
+
             if (takenData != null)
             {
-                // Downsample first
+                // Downsample the current half-second of data
                 float[] dfDowned = ModemProgram.DownsampleDownshift(takenData, calls);
 
-                // Send downsampled wave data to modem
+                // Decode the downsampled waveform data
                 ModemProgram.decodeMyWav(pcmStreamDec, dfDowned);
-                calls++;
-                val++;
-                if (val == 50)
-                        val=0;
 
+                // Increment call counter
+                calls++;
             }
         }
+
         Debug.WriteLine("\r\nReading Waveform Buffer Done.");
     }
+
 
     // Output any double array to csv, useful in debugging weird waveforms
     private static void outputAsCSV(double[] array, string filename)

@@ -455,7 +455,7 @@ public sealed class NIDAQController
         }
         catch(Exception exp)
         {
-            Trace.WriteLine("Producer: " + exp);
+            Debug.WriteLine("Producer: " + exp);//was Trace.WriteLine
             return null;
         }
 
