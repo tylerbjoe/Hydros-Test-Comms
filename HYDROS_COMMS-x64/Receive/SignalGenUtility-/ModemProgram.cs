@@ -256,7 +256,7 @@ namespace DelsysSigNIalGen
         // Send received waveform to the modem and read the same number of bytes back from pcm port
         public static void decodeMyWav(NetworkStream pcmStreamDec, float[] givenData)
         {
-            Trace.WriteLine($"fed: {givenData.Length}");
+            Debug.WriteLine($"fed: {givenData.Length}");
             byte[] byteArray = new byte[givenData.Length * sizeof(float)];
             Buffer.BlockCopy(givenData, 0, byteArray, 0, byteArray.Length);
 

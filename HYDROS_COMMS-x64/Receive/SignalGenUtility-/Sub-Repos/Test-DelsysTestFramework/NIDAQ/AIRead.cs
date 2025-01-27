@@ -2,6 +2,7 @@
 using DelsysTestLib.NIDAQ;
 using DelsysTestLib.Util;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 
 
 namespace DelsysTestFramework.NIDAQ
@@ -108,30 +109,100 @@ namespace DelsysTestFramework.NIDAQ
         {
             Task.Run(() =>
             {
-                try
-                {
-                    if (DAQ.RequestedStop) // if none are running then don't continue
-                        return;
+            //    try
+            //    {
+            //        if (DAQ.RequestedStop) // if none are running then don't continue
+            //            return;
 
-                    samplesBuffer = DAQ.AnalogContinueReadVoltage(currentAnalogTaskName, result, analogCallback);
-                    DataBuffer.TryAdd(samplesBuffer, 100);
-                    //GotInputData?.Invoke(this, new GotInputDataEventArgs(CHANNELS_NUMBER[0], samplesBuffer, SAMPLE_RATE, INPUT_BUFFER));
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("OnInputData:" + ex);
-                }
+            //        samplesBuffer = DAQ.AnalogContinueReadVoltage(currentAnalogTaskName, result, analogCallback);
+            //        DataBuffer.TryAdd(samplesBuffer, 100);
+            //        //GotInputData?.Invoke(this, new GotInputDataEventArgs(CHANNELS_NUMBER[0], samplesBuffer, SAMPLE_RATE, INPUT_BUFFER));
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Console.WriteLine("OnInputData:" + ex);
+            //    }
             });
         }
         
         public void Producer()
         {
+            //String mode = "DAQ";
+            String mode = "File";
+            double[] yValues = Array.Empty<double>(); ;
+            if (mode == "File")
+            {
+                string filePath = "U:\\Users Common\\TJoe\\Brandeis Pool Tests\\1.16.25\\trial_23.bin";
+
+                using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                using (BinaryReader reader = new BinaryReader(fs))
+                {
+                    try
+                    {
+                        // Calculate the total number of floats in the file
+                        long floatCount = fs.Length / sizeof(float);
+
+                        // Initialize the double array with the appropriate size
+                        yValues = new double[floatCount];
+
+                        for (long i = 0; i < floatCount; i++)
+                        {
+                            // Read a 32-bit float from the file and convert it to double
+                            float value = reader.ReadSingle();
+                            yValues[i] = (double)value;
+                        }
+
+                        Debug.WriteLine($"Successfully read {yValues.Length} values as double[].");
+                    }
+                    catch (EndOfStreamException)
+                    {
+                        Debug.WriteLine("Reached the end of the file unexpectedly.");
+                        yValues = Array.Empty<double>();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"An error occurred while reading the file: {ex.Message}");
+                        yValues = Array.Empty<double>();
+                    }
+                }
+            }
             Task.Run(() =>
             {
-                while (!DAQ.RequestedStop)
+                int currentIndex = 0;
+
+                while (!DAQ.RequestedStop && mode=="DAQ")
                 {
                     double[,] data = DAQ.AnalogContinueReadVoltageProducer(INPUT_BUFFER);
                     DataBuffer.TryAdd(data, 100);
+                }
+                while (currentIndex < yValues.Length && mode == "File")
+                {
+                    try
+                    {
+                        if (yValues != null && currentIndex < yValues.Length)
+                        {
+                            // Determine the actual size of the current batch
+                            int remaining = yValues.Length - currentIndex;
+                            int currentBatchSize = Math.Min(INPUT_BUFFER, remaining);
+
+                            // Create a new 2D array with the batch size
+                            double[,] dataBatch = new double[1, currentBatchSize];
+                            for (int i = 0; i < currentBatchSize; i++)
+                            {
+                                dataBatch[0, i] = yValues[currentIndex + i];
+                            }
+
+                            // Add the batch to the DataBuffer
+                            DataBuffer.TryAdd(dataBatch, 100);
+
+                            // Update the index to process the next batch
+                            currentIndex += currentBatchSize;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Error in File mode loop: {ex.Message}");
+                    }
                 }
             });
         }

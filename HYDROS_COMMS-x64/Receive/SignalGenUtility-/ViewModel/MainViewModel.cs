@@ -161,7 +161,7 @@ partial class MainViewModel : ObservableObject
                 {
                     if (_ff.AIRead.DataBuffer.Count > 1)
                     {
-                        Trace.WriteLine("in queue " + _ff.AIRead.DataBuffer.Count);
+                        //Trace.WriteLine("in queue " + _ff.AIRead.DataBuffer.Count);
                     }
 
                     _ff.AIRead.DataBuffer.TryTake(out var item);
@@ -178,6 +178,7 @@ partial class MainViewModel : ObservableObject
                     if (currData.Count >= 500_000)
                     {
                         // Add 0.5 seconds of data to readBuff to be decoded
+                        //Debug.WriteLine("adding line to readBuff to decode");
                         readBuff.Add(currData.ToArray());
                         calls++;
                         currData.Clear();
@@ -600,36 +601,38 @@ partial class MainViewModel : ObservableObject
     }
 
     // Gets 0.5s of data at a time from consumer architecture
-    private void ReadPackets()//List<List<double>> columns)//() 
+    private void ReadPackets()
     {
         int calls = 0;
-        int val = 0;
+
         while (!ModemProgram.globalStopped)
         {
             double[] takenData = null;
-            double[] unusedDACData = null;
             try
             {
                 takenData = readBuff.Take(); // gets waveform data from DAC buffer
             }
-            catch (InvalidOperationException) { }
+            catch (InvalidOperationException)
+            {
+                // Handle cases where readBuff.Take() throws an exception
+                Debug.WriteLine("Buffer operation failed.");
+            }
+
             if (takenData != null)
             {
-                // Downsample first
-                //Debug.WriteLine("ReadPackets Called", calls);
                 float[] dfDowned = ModemProgram.DownsampleDownshift(takenData, calls);
 
-                // Send downsampled wave data to modem
+                // Decode the downsampled waveform data
                 ModemProgram.decodeMyWav(pcmStreamDec, dfDowned);
-                calls++;
-                val++;
-                if (val == 50)
-                        val=0;
 
+                // Increment call counter
+                calls++;
             }
         }
+
         Debug.WriteLine("\r\nReading Waveform Buffer Done.");
     }
+
 
     // Output any double array to csv, useful in debugging weird waveforms
     private static void outputAsCSV(double[] array, string filename)

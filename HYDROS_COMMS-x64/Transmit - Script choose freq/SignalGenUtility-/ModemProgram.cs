@@ -585,13 +585,29 @@ namespace DelsysSigNIalGen
                 {
                     scaledValues[i] = Map(sigout[i], inputMin, inputMax, outputMin, outputMax);  // s(t) rescaled to DAC voltages
                 }
-                // Save cutArray to CSV
-                //SaveArrayToCsv("C:/Users/TJoe/Documents/Comms Intermmediate Outputs/txusus.csv", scaledValues);
+                // Save scaledValues as a binary file
+                string binaryPath = "C:\\Users\\TJoe\\OneDrive - Delsys Inc\\TJ HYDROS\\HYDROS comms\\laptop demod\\scaledValues300.bin";
+                SaveArrayToBinary(binaryPath, scaledValues);
+
 
                 waveBuff.Add(scaledValues);
             }
 
         }
+
+        private static void SaveArrayToBinary(string binaryPath, float[] array)
+        {
+            // Open the file in append mode
+            using (var writer = new BinaryWriter(File.Open(binaryPath, FileMode.Append)))
+            {
+                foreach (var value in array)
+                {
+                    writer.Write(value); // Append each 32-bit float value to the file
+                }
+            }
+        }
+
+
         private static void SaveArrayToCsv(string csvPath, double[] cutArray)
         {
             // Check if the file exists
