@@ -499,14 +499,17 @@ partial class MainViewModel : ObservableObject
         ModemProgram.secretCarrierFrequency = 100000; // Carrier Frequency;
         ModemProgram.secretCarrierFrequency2 = 150000; // Carrier Frequency;
 
-        ModemProgram.voltageAmplitude = 3; // +/- voltageAmplitude is the max/min waveform voltages
-        ModemProgram.voltageAmplitude2 = 3; // +/- voltageAmplitude is the max/min waveform voltages
+        ModemProgram.voltageAmplitude = 40; // +/- voltageAmplitude is the max/min waveform voltages
+        ModemProgram.voltageAmplitude2 = 7; // +/- voltageAmplitude is the max/min waveform voltages
 
         ModemProgram.globalStopped = false;
         PlotData.YValues.Clear(); // reset anything that could be read
         waveBuff = new BlockingCollection<float[]>();
-        
 
+
+        // Scaling Amplitude for DAC
+        ModemProgram.voltageAmplitude = ModemProgram.voltageAmplitude/4; // +/- voltageAmplitude is the max/min waveform voltages
+        ModemProgram.voltageAmplitude2 = ModemProgram.voltageAmplitude2/4; // +/- voltageAmplitude is the max/min waveform voltages
         // Generate encoded waveforms
         CancellationTokenSource cts = new CancellationTokenSource();
         if (ModemProgram.numTransducers == 2)

@@ -3,6 +3,7 @@ using DelsysTestLib.NIDAQ;
 using DelsysTestLib.Util;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System;
 
 
 namespace DelsysTestFramework.NIDAQ
@@ -101,6 +102,60 @@ namespace DelsysTestFramework.NIDAQ
             this.CHANNELS = new string[] { "AI30", "AI31" };
             DAQ.AnalogBeginReadVoltage($"Psig{range}", CHANNELS, INPUT_BUFFER, SAMPLE_RATE, analogCallback, range);
         }
+        //public static double[] ApplyBandpassFilter(double[] input, double lowCutoff, double highCutoff, int sampleRate, int filterLength)
+        //{
+        //    // Generate the FIR filter coefficients using a simple windowed-sinc function
+        //    var coefficients = DesignBandpassFilter(lowCutoff, highCutoff, sampleRate, filterLength);
+
+        //    // Apply the filter using convolution
+        //    double[] output = new double[input.Length];
+
+        //    for (int i = 0; i < input.Length; i++)
+        //    {
+        //        double sum = 0;
+        //        for (int j = 0; j < coefficients.Length; j++)
+        //        {
+        //            if (i - j >= 0)
+        //            {
+        //                sum += coefficients[j] * input[i - j];
+        //            }
+        //        }
+        //        output[i] = sum;
+        //    }
+
+        //    return output;
+        //}
+
+        //private static double[] DesignBandpassFilter(double lowCutoff, double highCutoff, int sampleRate, int filterLength)
+        //{
+        //    // Normalize the frequencies by the Nyquist frequency
+        //    double nyquist = sampleRate / 2.0;
+        //    double lowNorm = lowCutoff / nyquist;
+        //    double highNorm = highCutoff / nyquist;
+
+        //    // Create a sinc function for the bandpass filter
+        //    double[] filter = new double[filterLength];
+        //    for (int i = 0; i < filterLength; i++)
+        //    {
+        //        if (i == filterLength / 2) // the central value should be the difference of the frequencies
+        //        {
+        //            filter[i] = highNorm - lowNorm;
+        //        }
+        //        else
+        //        {
+        //            double n = i - filterLength / 2;
+        //            filter[i] = (Math.Sin(2 * Math.PI * highNorm * n) - Math.Sin(2 * Math.PI * lowNorm * n)) / (Math.PI * n);
+        //        }
+        //    }
+
+        //    // Apply a window function (Hamming Window here)
+        //    for (int i = 0; i < filter.Length; i++)
+        //    {
+        //        filter[i] *= 0.54 - 0.46 * Math.Cos(2 * Math.PI * i / (filter.Length - 1)); // Hamming window
+        //    }
+
+        //    return filter;
+        //}
 
         public bool NiFailed = false;
         public BlockingCollection<double[,]> DataBuffer = new BlockingCollection<double[,]>();
@@ -132,7 +187,8 @@ namespace DelsysTestFramework.NIDAQ
             double[] yValues = Array.Empty<double>(); ;
             if (mode == "File")
             {
-                string filePath = "U:\\Users Common\\TJoe\\Brandeis Pool Tests\\1.16.25\\trial_23.bin";
+                string filePath = "U:\\Users Common\\TJoe\\Brandeis Pool Tests\\1.16.25\\trial_17.bin";
+                //string filePath = "C:\\Users\\TJoe\\OneDrive - Delsys Inc\\TJ HYDROS\\HYDROS comms\\laptop demod\\bandpassed\\trial_17.bin";
 
                 using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
                 using (BinaryReader reader = new BinaryReader(fs))
@@ -153,6 +209,13 @@ namespace DelsysTestFramework.NIDAQ
                         }
 
                         Debug.WriteLine($"Successfully read {yValues.Length} values as double[].");
+                        //double lowCutoff = 297500;   // Low cutoff frequency in Hz
+                        //double highCutoff = 102500; // High cutoff frequency in Hz
+                        //int sampleRate = 1000000;   // Sampling rate in Hz
+                        //int filterLength = 101;  // Filter length (odd number recommended for symmetry)
+                        //yValues = ApplyBandpassFilter(yValues, lowCutoff, highCutoff, sampleRate, filterLength);
+
+                        //Debug.WriteLine($"Successfully bandpassed.");
                     }
                     catch (EndOfStreamException)
                     {
