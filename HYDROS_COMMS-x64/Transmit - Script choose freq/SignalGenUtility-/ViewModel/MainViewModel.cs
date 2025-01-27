@@ -193,6 +193,41 @@ partial class MainViewModel : ObservableObject
         while (!ModemProgram.globalStopped && !cts3.Token.IsCancellationRequested)
         {
             float[] takenData = null;
+            try
+            {
+                takenData = waveBuff.Take(); // See if data loaded in
+            }
+            catch (InvalidOperationException) { }
+
+            if (takenData != null)
+            {
+                // First data starts the whole program
+                if (waveCalls == 0)
+                {
+                    PlotData.Clear();
+                    PlotData.Clear();
+                    StartNICard();
+                }
+                Trace.WriteLine($"Added waveforms #{waveCalls}!");
+                TransmitWave(takenData);
+                waveCalls++;
+            }
+
+            if (waveCalls == ModemProgram.numPackets)
+            {
+                cts3.Cancel();
+                break;
+            }
+        }
+        System.Diagnostics.Debug.WriteLine("\r\nBuffer to Transducer Done.");
+    }
+    public async Task GetWaveBuff2(CancellationTokenSource cts3)
+    {
+        int waveCalls = 0;
+
+        while (!ModemProgram.globalStopped && !cts3.Token.IsCancellationRequested)
+        {
+            float[] takenData = null;
             float[] takenData2 = null;
             try
             {
@@ -225,6 +260,21 @@ partial class MainViewModel : ObservableObject
     }
 
     // Send loaded signal to transducer
+    public void TransmitWave(float[] takenData)
+    {
+        AOSampleRate = 1_000_000; // Hz
+
+        // Send to transducer over TF.PIN.#
+        _ff.StartGeneratedSignalFromFloatArray(Hw.GetPinAddress(TF_PIN.AO0), takenData, AOSampleRate, false);
+        ZoomExtents = true;
+
+        double durationMs = takenData.Length / 1_000; // This works for AOSampleRate of 1MHz
+        Task.Delay((int)durationMs).Wait();
+
+        // Make the transducer continue the same last value (should be 0) until next signal is received
+        _ff.StopGeneratedSignal(Hw.GetPinAddress(TF_PIN.AO0));
+    }
+
     public void TransmitWave(float[] takenData, float[] takenData2)
     {
         AOSampleRate = 1_000_000; // Hz
@@ -443,6 +493,8 @@ partial class MainViewModel : ObservableObject
     [RelayCommand]
     public void PlayData() // Send packets
     {
+        ModemProgram.numTransducers = 1; // number of transducers
+
         ModemProgram.numPackets = 50; // number of packets to send
         ModemProgram.secretCarrierFrequency = 100000; // Carrier Frequency;
         ModemProgram.secretCarrierFrequency2 = 150000; // Carrier Frequency;
@@ -453,15 +505,27 @@ partial class MainViewModel : ObservableObject
         ModemProgram.globalStopped = false;
         PlotData.YValues.Clear(); // reset anything that could be read
         waveBuff = new BlockingCollection<float[]>();
-        waveBuff2 = new BlockingCollection<float[]>();
+        
 
         // Generate encoded waveforms
         CancellationTokenSource cts = new CancellationTokenSource();
-        Task.Run(() => ModemProgram.GetVals(stream, pcmStream, waveBuff, waveBuff2, cts));
+        if (ModemProgram.numTransducers == 2)
+        {
+            waveBuff2 = new BlockingCollection<float[]>();
+            Task.Run(() => ModemProgram.GetVals(stream, pcmStream, waveBuff, waveBuff2, cts));
+            // Generate Wave Buff
+            CancellationTokenSource cts3 = new CancellationTokenSource();
+            Task.Run(() => GetWaveBuff2(cts3));
+        }
+        else if (ModemProgram.numTransducers == 1)
+        {
+            Task.Run(() => ModemProgram.GetVals(stream, pcmStream, waveBuff, cts));
+            // Generate Wave Buff
+            CancellationTokenSource cts3 = new CancellationTokenSource();
+            Task.Run(() => GetWaveBuff(cts3));
+        }
 
-        // Generate Wave Buff
-        CancellationTokenSource cts3 = new CancellationTokenSource();
-        Task.Run(() => GetWaveBuff(cts3));
+        
     }
 
 

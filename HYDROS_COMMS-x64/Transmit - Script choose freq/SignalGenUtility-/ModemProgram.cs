@@ -35,6 +35,7 @@ namespace DelsysSigNIalGen
 
         // These get accessed from MainViewModel.cs, so they are public
         public static bool globalStopped = false;
+        public static int numTransducers = 2; // number of transducers to transmit
         public static int trialNum = 0; // Changes names of files
         public static int secretCarrierFrequency = -1; // Carrier frequency in Hz, for across the water // Will be set by on-screen input
         public static int secretCarrierFrequency2 = -1; // Carrier frequency in Hz, for across the water // Will be set by on-screen input
@@ -236,6 +237,29 @@ namespace DelsysSigNIalGen
         }
 
         // Get the hr&spo2 values from CSVs
+        public static async Task GetVals(NetworkStream stream, NetworkStream pcmStream, BlockingCollection<float[]> waveBuff, CancellationTokenSource cts)
+        {
+            int calls = ModemProgram.secretCarrierFrequency / 1000;
+            while (!cts.Token.IsCancellationRequested)  // Check for cancellation request
+            {
+                //Thread.Sleep(200); // for debugging non-real time, should pause a bit
+                (int hr, int spo2) = getNextVals(calls);
+                RunModemProgram(hr, spo2, stream, pcmStream, calls, waveBuff, ModemProgram.secretCarrierFrequency, ModemProgram.voltageAmplitude);
+                calls++;
+
+
+                // There are currently csvs for 0-1000 values. Reset after reaching the end.
+                if (calls == (ModemProgram.secretCarrierFrequency / 1000) + ModemProgram.numPackets)
+                {
+                    cts.Cancel(); // Cancel the task gracefully after 50 calls
+                    break;
+                }
+            }
+
+            Console.WriteLine("Task has been canceled or completed.");
+        }
+
+        // Get the hr&spo2 values from CSVs overloaded for 2 transducers
         public static async Task GetVals(NetworkStream stream, NetworkStream pcmStream, BlockingCollection<float[]> waveBuff, BlockingCollection<float[]> waveBuff2, CancellationTokenSource cts)
         {
             int calls = ModemProgram.secretCarrierFrequency / 1000;
