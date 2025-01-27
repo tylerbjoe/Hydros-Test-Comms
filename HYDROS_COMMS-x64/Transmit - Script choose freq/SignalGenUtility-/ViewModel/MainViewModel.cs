@@ -499,7 +499,7 @@ partial class MainViewModel : ObservableObject
         ModemProgram.secretCarrierFrequency = 100000; // Carrier Frequency;
         ModemProgram.secretCarrierFrequency2 = 150000; // Carrier Frequency;
 
-        ModemProgram.voltageAmplitude = 1; // +/- voltageAmplitude is the max/min waveform voltages
+        ModemProgram.voltageAmplitude = 3; // +/- voltageAmplitude is the max/min waveform voltages
         ModemProgram.voltageAmplitude2 = 3; // +/- voltageAmplitude is the max/min waveform voltages
 
         ModemProgram.globalStopped = false;
