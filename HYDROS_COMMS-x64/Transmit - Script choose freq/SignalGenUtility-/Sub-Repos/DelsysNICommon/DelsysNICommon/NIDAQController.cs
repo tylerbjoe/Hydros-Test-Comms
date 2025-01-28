@@ -805,18 +805,18 @@ public sealed class NIDAQController
         AnalogSingleChannelWriter writer =
          new AnalogSingleChannelWriter(aoTask.Stream);
 
-        //write data to buffer
-        double[] dblData = Array.ConvertAll(data, x => (double)x);
+        ////write data to buffer
+        //double[] dblData = Array.ConvertAll(data, x => (double)x);
 
-        //// Sine Wave
-        //double[] dblData = new double[data.Length];
-        //double frequency = 100000;  // Sine wave frequency in Hz
-        //double samplingFrequency = 1000000; // Sampling frequency in Hz
-        //for (int i = 0; i < data.Length; i++)
-        //{
-        //    double t = i / samplingFrequency; // Time index
-        //    dblData[i] = 5 * Math.Sin(2 * Math.PI * frequency * t); // Sine wave for row 0
-        //}
+        // Sine Wave
+        double[] dblData = new double[data.Length];
+        double frequency = 100000;  // Sine wave frequency in Hz
+        double samplingFrequency = 1000000; // Sampling frequency in Hz
+        for (int i = 0; i < data.Length; i++)
+        {
+            double t = i / samplingFrequency; // Time index
+            dblData[i] = 5 * Math.Sin(2 * Math.PI * frequency * t); // Sine wave for row 0
+        }
 
         writer.WriteMultiSample(false,dblData);
         aoTask.Start();

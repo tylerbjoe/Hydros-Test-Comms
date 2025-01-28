@@ -182,13 +182,12 @@ namespace DelsysTestFramework.NIDAQ
         
         public void Producer()
         {
-            String mode = "DAQ";
-            //String mode = "File";
+            //String mode = "DAQ";
+            String mode = "File";
             double[] yValues = Array.Empty<double>(); ;
             if (mode == "File")
             {
-                string filePath = "U:\\Users Common\\TJoe\\Brandeis Pool Tests\\1.16.25\\trial_17.bin";
-                //string filePath = "C:\\Users\\TJoe\\OneDrive - Delsys Inc\\TJ HYDROS\\HYDROS comms\\laptop demod\\bandpassed\\trial_17.bin";
+                string filePath = "U:\\Users Common\\TJoe\\Brandeis Pool Tests\\1.16.25\\trial_14.bin";
 
                 using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
                 using (BinaryReader reader = new BinaryReader(fs))
@@ -209,13 +208,6 @@ namespace DelsysTestFramework.NIDAQ
                         }
 
                         Debug.WriteLine($"Successfully read {yValues.Length} values as double[].");
-                        //double lowCutoff = 297500;   // Low cutoff frequency in Hz
-                        //double highCutoff = 102500; // High cutoff frequency in Hz
-                        //int sampleRate = 1000000;   // Sampling rate in Hz
-                        //int filterLength = 101;  // Filter length (odd number recommended for symmetry)
-                        //yValues = ApplyBandpassFilter(yValues, lowCutoff, highCutoff, sampleRate, filterLength);
-
-                        //Debug.WriteLine($"Successfully bandpassed.");
                     }
                     catch (EndOfStreamException)
                     {

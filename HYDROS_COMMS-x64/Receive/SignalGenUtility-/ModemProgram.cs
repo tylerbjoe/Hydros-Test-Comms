@@ -214,7 +214,7 @@ namespace DelsysSigNIalGen
             SetValue("PayloadMode", 0, 1, streamDec);
 
             // For debugging, send a csv to make sure modem connection works
-            //sendCSV(streamDec, pcmStreamDec, 0);
+            sendCSV(streamDec, pcmStreamDec, 0);
 
             return (streamDec, pcmStreamDec, clientDec, pcmClientDec);
         }
