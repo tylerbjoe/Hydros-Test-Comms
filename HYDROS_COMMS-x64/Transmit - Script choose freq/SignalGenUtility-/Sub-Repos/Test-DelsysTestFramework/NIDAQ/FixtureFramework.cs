@@ -76,11 +76,11 @@ namespace DelsysTestLib.NIDAQ
             DAQ.StartGenerateFunction(pin, waveformType, frequency, pk_pk / 2.0, 2_000_000, 2_000_000, dc_offset);
             Task.Delay(100);
         }
-        public void StartGeneratedSignalFromFloatArray(string pin, float[] data, int outFreq, bool regeneration)
+        public void StartGeneratedSignalFromFloatArray(string pin, float[] data, int outFreq, bool regeneration, int sine, int carrierFreq, float voltageAmp)
         {
             try
             {
-                DAQ.StartFunctionFromFloatArray(pin, data, outFreq, regeneration); // 44.1kHz is the most common .wav file sample rate
+                DAQ.StartFunctionFromFloatArray(pin, data, outFreq, regeneration, sine, carrierFreq, voltageAmp); // 44.1kHz is the most common .wav file sample rate
 
             }
             catch (Exception ex)
@@ -91,11 +91,11 @@ namespace DelsysTestLib.NIDAQ
 
             Task.Delay(100);
         }
-        public void StartGeneratedSignalFromFloatArray(string pin, string pin2, float[] data, float[] data2, int outFreq, bool regeneration)
+        public void StartGeneratedSignalFromFloatArray(string pin, string pin2, float[] data, float[] data2, int outFreq, bool regeneration, int sine, int carrierFreq, int carrierFreq2, float voltageAmp, float voltageAmp2)
         {
             try
             {
-                DAQ.StartFunctionFromFloatArrayTwo(pin, pin2, data, data2, outFreq, regeneration); // 44.1kHz is the most common .wav file sample rate
+                DAQ.StartFunctionFromFloatArrayTwo(pin, pin2, data, data2, outFreq, regeneration, sine, carrierFreq, carrierFreq2, voltageAmp, voltageAmp2); // 44.1kHz is the most common .wav file sample rate
 
             }
             catch (Exception ex)

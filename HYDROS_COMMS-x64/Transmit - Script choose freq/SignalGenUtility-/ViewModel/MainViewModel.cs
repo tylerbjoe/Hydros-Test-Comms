@@ -265,7 +265,7 @@ partial class MainViewModel : ObservableObject
         AOSampleRate = 1_000_000; // Hz
 
         // Send to transducer over TF.PIN.#
-        _ff.StartGeneratedSignalFromFloatArray(Hw.GetPinAddress(TF_PIN.AO0), takenData, AOSampleRate, false);
+        _ff.StartGeneratedSignalFromFloatArray(Hw.GetPinAddress(TF_PIN.AO0), takenData, AOSampleRate, false, ModemProgram.sine, ModemProgram.secretCarrierFrequency, ModemProgram.voltageAmplitude);
         ZoomExtents = true;
 
         double durationMs = takenData.Length / 1_000; // This works for AOSampleRate of 1MHz
@@ -280,7 +280,7 @@ partial class MainViewModel : ObservableObject
         AOSampleRate = 1_000_000; // Hz
 
         // Send to transducer over TF.PIN.#
-        _ff.StartGeneratedSignalFromFloatArray(Hw.GetPinAddress(TF_PIN.AO0), Hw.GetPinAddress(TF_PIN.AO1), takenData, takenData2, AOSampleRate, false);
+        _ff.StartGeneratedSignalFromFloatArray(Hw.GetPinAddress(TF_PIN.AO0), Hw.GetPinAddress(TF_PIN.AO1), takenData, takenData2, AOSampleRate, false, ModemProgram.sine, ModemProgram.secretCarrierFrequency, ModemProgram.secretCarrierFrequency2, ModemProgram.voltageAmplitude, ModemProgram.voltageAmplitude2);
         ZoomExtents = true;
 
         double durationMs = takenData.Length / 1_000; // This works for AOSampleRate of 1MHz
@@ -493,14 +493,15 @@ partial class MainViewModel : ObservableObject
     [RelayCommand]
     public void PlayData() // Send packets
     {
-        ModemProgram.numTransducers = 1; // number of transducers
+        ModemProgram.numTransducers = 2; // number of transducers
+        ModemProgram.sine = 2; // set 0 to not tranmit sine, set 1 to transmit only t1 sine, set 2 to transmit only t2 sine, set 3 to transmit both sine
 
-        ModemProgram.numPackets = 50; // number of packets to send
+        ModemProgram.numPackets = 10; // number of packets to send
         ModemProgram.secretCarrierFrequency = 100000; // Carrier Frequency;
-        ModemProgram.secretCarrierFrequency2 = 150000; // Carrier Frequency;
+        ModemProgram.secretCarrierFrequency2 = 100000; // Carrier Frequency;
 
-        ModemProgram.voltageAmplitude = 40; // +/- voltageAmplitude is the max/min waveform voltages
-        ModemProgram.voltageAmplitude2 = 7; // +/- voltageAmplitude is the max/min waveform voltages
+        ModemProgram.voltageAmplitude = 10; // +/- voltageAmplitude is the max/min waveform voltages
+        ModemProgram.voltageAmplitude2 = 5; // +/- voltageAmplitude is the max/min waveform voltages
 
         ModemProgram.globalStopped = false;
         PlotData.YValues.Clear(); // reset anything that could be read

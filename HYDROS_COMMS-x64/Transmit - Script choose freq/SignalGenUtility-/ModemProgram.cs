@@ -42,6 +42,7 @@ namespace DelsysSigNIalGen
         public static int numPackets; // Change number of packets being sent
         public static float voltageAmplitude; // +/- voltageAmplitude is max/min voltage waves are sent at
         public static float voltageAmplitude2; // +/- voltageAmplitude is max/min voltage waves are sent at
+        public static int sine = 0; // set true to transmit sine wave instead of packets
 
 
         // Receive control messages from modem

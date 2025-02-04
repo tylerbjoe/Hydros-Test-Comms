@@ -771,7 +771,7 @@ public sealed class NIDAQController
 
         return reader.ReadMultiSample(100).Average();
     }
-    public void StartFunctionFromFloatArray(string pinName, float[] data, double clkRate, bool regenerate)
+    public void StartFunctionFromFloatArray(string pinName, float[] data, double clkRate, bool regenerate, int sine, int carrierFreq, float voltageAmp)
     {
         TaskList.TryGetValue(pinName, out DAQmx.Task doTask);
         if (doTask != null)
@@ -802,27 +802,30 @@ public sealed class NIDAQController
                                            SampleQuantityMode.ContinuousSamples, data.Length);
         
 
-        AnalogSingleChannelWriter writer =
-         new AnalogSingleChannelWriter(aoTask.Stream);
+        AnalogSingleChannelWriter writer = new AnalogSingleChannelWriter(aoTask.Stream);
 
-        ////write data to buffer
-        //double[] dblData = Array.ConvertAll(data, x => (double)x);
-
-        // Sine Wave
         double[] dblData = new double[data.Length];
-        double frequency = 100000;  // Sine wave frequency in Hz
-        double samplingFrequency = 1000000; // Sampling frequency in Hz
-        for (int i = 0; i < data.Length; i++)
+        if (sine==1)
         {
-            double t = i / samplingFrequency; // Time index
-            dblData[i] = 5 * Math.Sin(2 * Math.PI * frequency * t); // Sine wave for row 0
+            // Sine Wave
+            double samplingFrequency = 1000000; // Sampling frequency in Hz
+            for (int i = 0; i < data.Length; i++)
+            {
+                double t = i / samplingFrequency; // Time index
+                dblData[i] = voltageAmp * Math.Sin(2 * Math.PI * carrierFreq * t); // Sine wave for row 0
+            }
+        }
+        else if (sine == 0)
+        {
+            // write data to buffer
+            dblData = Array.ConvertAll(data, x => (double)x);
         }
 
         writer.WriteMultiSample(false,dblData);
         aoTask.Start();
     }
 
-    public void StartFunctionFromFloatArrayTwo(string pinName, string pinName2, float[] data, float[] data2, double clkRate, bool regenerate)
+    public void StartFunctionFromFloatArrayTwo(string pinName, string pinName2, float[] data, float[] data2, double clkRate, bool regenerate, int sine, int carrierFreq, int carrierFreq2, float voltageAmp, float voltageAmp2)
     {
         TaskList.TryGetValue(pinName, out DAQmx.Task doTask);
         if (doTask != null)
@@ -860,31 +863,51 @@ public sealed class NIDAQController
         //write data to buffer
         double[] dblData = Array.ConvertAll(data, x => (double)x);
         double[] dblData2 = Array.ConvertAll(data2, x => (double)x);
-        var newData = ConvertTo2DArray(dblData, dblData2, 2, dblData.Length - 1);
+        var newData = ConvertTo2DArray(dblData, dblData2, 2, dblData.Length - 1, sine, carrierFreq, carrierFreq2, voltageAmp, voltageAmp2);
         writer.WriteMultiSample(false, newData);
         aoTask.Start();
     }
-    public double[,] ConvertTo2DArray(double[] data, double[] data2, int rows, int cols)
+    public double[,] ConvertTo2DArray(double[] data, double[] data2, int rows, int cols, int sine, int carrierFreq, int carrierFreq2, float voltageAmp, float voltageAmp2)
     {
         double[,] result = new double[rows, data.Length];
-
-        //// Real Data
-        //for (int i = 0; i < data.Length-1; i++)
-        //{
-        //    result[0, i] = data[i];
-        //    result[1, i] = data2[i];
-        //}
-
-        // Sine Wave
-        double frequency = 100000;  // Sine wave frequency in Hz
-        double samplingFrequency = 1000000; // Sampling frequency in Hz
-        for (int i = 0; i < cols; i++)
+        if (sine == 3)
         {
-            double t = i / samplingFrequency; // Time index
-            result[0, i] = Math.Sin(2 * Math.PI * frequency * t); // Sine wave for row 0
-            result[1, i] = Math.Sin(2 * Math.PI * frequency * t); // Sine wave for row 1
+            double samplingFrequency = 1000000; // Sampling frequency in Hz
+            for (int i = 0; i < cols; i++)
+            {
+                double t = i / samplingFrequency; // Time index
+                result[0, i] = voltageAmp * Math.Sin(2 * Math.PI * carrierFreq * t); // Sine wave for row 0
+                result[1, i] = voltageAmp2 * Math.Sin(2 * Math.PI * carrierFreq2 * t); // Sine wave for row 1
+            }
         }
-
+        if (sine == 2)
+        {
+            double samplingFrequency = 1000000; // Sampling frequency in Hz
+            for (int i = 0; i < cols; i++)
+            {
+                double t = i / samplingFrequency; // Time index
+                result[0, i] = data[i];
+                result[1, i] = voltageAmp2 * Math.Sin(2 * Math.PI * carrierFreq2 * t); // Sine wave for row 1
+            }
+        }
+        if (sine == 1)
+        {
+            double samplingFrequency = 1000000; // Sampling frequency in Hz
+            for (int i = 0; i < cols; i++)
+            {
+                double t = i / samplingFrequency; // Time index
+                result[0, i] = voltageAmp2 * Math.Sin(2 * Math.PI * carrierFreq2 * t);
+                result[1, i] = data2[i];
+            }
+        }
+        else if (sine==0)
+        {
+            for (int i = 0; i < data.Length - 1; i++)
+            {
+                result[0, i] = data[i];
+                result[1, i] = data2[i];
+            }
+        }
         return result;
     }
 
