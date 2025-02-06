@@ -494,14 +494,14 @@ partial class MainViewModel : ObservableObject
     public void PlayData() // Send packets
     {
         ModemProgram.numTransducers = 2; // number of transducers
-        ModemProgram.sine = 2; // set 0 to not tranmit sine, set 1 to transmit only t1 sine, set 2 to transmit only t2 sine, set 3 to transmit both sine
+        ModemProgram.sine = 0; // set 0 to not tranmit sine, set 1 to transmit only t1 sine, set 2 to transmit only t2 sine, set 3 to transmit both sine
 
         ModemProgram.numPackets = 10; // number of packets to send
         ModemProgram.secretCarrierFrequency = 100000; // Carrier Frequency;
-        ModemProgram.secretCarrierFrequency2 = 100000; // Carrier Frequency;
+        ModemProgram.secretCarrierFrequency2 = 101000; // Carrier Frequency;
 
-        ModemProgram.voltageAmplitude = 10; // +/- voltageAmplitude is the max/min waveform voltages
-        ModemProgram.voltageAmplitude2 = 5; // +/- voltageAmplitude is the max/min waveform voltages
+        ModemProgram.voltageAmplitude = 20; // +/- voltageAmplitude is the max/min waveform voltages
+        ModemProgram.voltageAmplitude2 = 10; // +/- voltageAmplitude is the max/min waveform voltages
 
         ModemProgram.globalStopped = false;
         PlotData.YValues.Clear(); // reset anything that could be read

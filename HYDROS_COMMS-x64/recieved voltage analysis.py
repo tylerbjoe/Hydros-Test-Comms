@@ -34,7 +34,7 @@ def get_fft(signal, fs):
     freqs = np.fft.fftfreq(len(signal), 1 / fs)
     return freqs[:len(signal) // 2], fft_vals[:len(signal) // 2]
 
-def integrate_fft_power(freqs, power_spectrum, center_freq=100000, bandwidth=2500):
+def integrate_fft_power(freqs, power_spectrum, center_freq=300000, bandwidth=2500):
     """
     Integrate the power spectral density in a given frequency band.
     
@@ -59,32 +59,32 @@ def integrate_fft_power(freqs, power_spectrum, center_freq=100000, bandwidth=250
 fs = 1_000_000  # Sampling frequency in Hz
 index = [1,10,20]#np.arange(1, 21)  # Packet tx voltages
 packet=[]
-for ind in index:
-    file_path = fr"C:\Users\TJoe\OneDrive - Delsys Inc\TJ HYDROS\HYDROS comms\Recieved Demod Test 1\packet{ind}v.bin"
-    
-    # Load and normalize signal
-    out1 = load_signals_from_binary(file_path)
-    normalized_out1 = out1 - np.mean(out1)
-    
-    # Compute FFT
-    out1_freqs, out1_power_spectrum = get_fft(normalized_out1, fs)
-    
-    # Integrate power around 100 kHz ± 2.5 kHz
-    power_integral = integrate_fft_power(out1_freqs, out1_power_spectrum, center_freq=100000, bandwidth=2500)
-    
-    print(f"Packet {ind}: Integrated power in {100000} ± {2500} Hz = {power_integral}")
-    
-    packet.append(power_integral)
+# for ind in index:
+file_path = r"U:\Users Common\TJoe\Brandeis Pool Tests\1.16.25\trial_17.bin"
+
+# Load and normalize signal
+out1 = load_signals_from_binary(file_path)
+normalized_out1 = out1 - np.mean(out1)
+# out1=out1[:1000000*3]
+# Compute FFT
+out1_freqs, out1_power_spectrum = get_fft(normalized_out1, fs)
+
+# Integrate power around 100 kHz ± 2.5 kHz
+power_integral = integrate_fft_power(out1_freqs, out1_power_spectrum, center_freq=100000, bandwidth=2500)
+
+print(f"t7: Integrated power in {100000} ± {2500} Hz = {power_integral}")
+
+# packet.append(power_integral)
 
 #%% Plot FFT
 # Plot the frequency spectrum
-# plt.figure(figsize=(10, 6))
-# plt.plot(out1_freqs, out1_fftvals)
-# plt.title("10v packet 2v sine")
-# plt.xlabel("Frequency (Hz)")
-# plt.ylabel("Magnitude")
-# plt.grid()
-# plt.show()
+plt.figure(figsize=(10, 6))
+plt.plot(out1_freqs, out1_power_spectrum)
+plt.title("trial 17 300kHz")
+plt.xlabel("Frequency (Hz)")
+plt.ylabel("Magnitude")
+plt.grid()
+plt.show()
 
 
 #%% Plot sft
@@ -109,18 +109,18 @@ for ind in index:
 # # #%%
 
 #%%
-#plot rx psd and linear model
-# Perform linear regression
-index = np.array(index)
-plt.figure()
-plt.title('Power Spectral Density at Test Position')
+# #plot rx psd and linear model
+# # Perform linear regression
+# index = np.array(index)
+# plt.figure()
+# plt.title('Power Spectral Density at Test Position')
 
-plt.plot(index,packet,label='Packet')
-plt.plot(index,index*linregress(index,packet).slope,label=f'slope={linregress(index,packet).slope:.2f}', linestyle='--', color='grey')
+# plt.plot(index,packet,label='Packet')
+# plt.plot(index,index*linregress(index,packet).slope,label=f'slope={linregress(index,packet).slope:.2f}', linestyle='--', color='grey')
 
-plt.xlabel('Tx Voltage')
-plt.ylabel('Rx Packet PSD (Voltage^2)')
+# plt.xlabel('Tx Voltage')
+# plt.ylabel('Rx Packet PSD (Voltage^2)')
     
-plt.legend()
-plt.show()
+# plt.legend()
+# plt.show()
     
