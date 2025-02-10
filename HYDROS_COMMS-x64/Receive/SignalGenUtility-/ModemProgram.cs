@@ -268,7 +268,7 @@ namespace DelsysSigNIalGen
         // Should decode the values [60, 95]
         public static void sendCSV(NetworkStream stream, NetworkStream pcmStream, int calls)
         {
-            string filePath = $"U:\\Users Common\\AnnaE\\csvsUW\\DownOut_RT_0.csv";
+            string filePath = $"C:\\Users\\TJoe\\OneDrive - Delsys Inc\\TJ HYDROS\\HYDROS comms\\test_vals\\DownOut_RT_0.csv";
             List<float> floatList = new List<float>();
 
             // Read the CSV file
