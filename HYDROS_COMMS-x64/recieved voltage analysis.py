@@ -129,7 +129,7 @@ import numpy as np
 
 # Specify the input and output file names
 input_file = r"U:\Users Common\TJoe\Brandeis Pool Tests\2.6.25\trial_13.bin"
-output_file = r"U:\Users Common\TJoe\Brandeis Pool Tests\2.6.25\trial_13_packets\packet_5.bin"
+output_file = r"U:\Users Common\TJoe\Brandeis Pool Tests\2.6.25\trial_13_packets\start_noise.bin"
 
 # Define the data type; adjust as needed (e.g., np.float32 or np.float64)
 dtype = np.float32
@@ -139,7 +139,7 @@ data = np.fromfile(input_file, dtype=dtype)
 print("Original data:", data)
 
 # Slice the array as needed; for example, take elements from index 10 to 20
-splice = data[int(5.45e7):int(5.72e7)]
+splice = data[int(0.01e7):int(0.26e7)]
 print("Spliced data:", splice)
 
 # Save the spliced array to a new binary file
