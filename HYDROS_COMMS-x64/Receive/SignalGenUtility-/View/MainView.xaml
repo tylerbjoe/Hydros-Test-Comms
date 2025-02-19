@@ -181,10 +181,18 @@
                     </sciChart:SciChartSurface>
 
                     <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}"
-                               Margin="10"
+                               Margin="10,10,650,10"
                                Foreground="CadetBlue"
                                Text="SPO2:"
-                                   Grid.Row="2"
+                               Grid.Row="2"
+                               FontSize="25"
+                               />
+
+                    <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}"
+                               Margin="95,10,500,10"
+                               Foreground="CadetBlue"
+                               Text="000"
+                               Grid.Row="2"
                                FontSize="25"
                                />
                     <!-- Second new plot -->
