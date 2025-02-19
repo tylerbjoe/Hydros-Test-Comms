@@ -165,7 +165,7 @@ namespace DelsysSigNIalGen
         }
 
         // Construct and send proper TransmitJSON json string with hr and spo2 values
-        static void sendData(int hr, int spo2, int numRec, NetworkStream stream)
+        static void sendData(int hr, int spo2, int time_stamp, int numRec, NetworkStream stream)
         {
             var data = new
             {
@@ -174,7 +174,7 @@ namespace DelsysSigNIalGen
                 {
                     Payload = new
                     {
-                        Data = new int[] { hr, spo2 }
+                        Data = new int[] { hr, spo2, time_stamp }
                     }
                 }
             };
@@ -240,12 +240,15 @@ namespace DelsysSigNIalGen
         // Get the hr&spo2 values from CSVs
         public static async Task GetVals(NetworkStream stream, NetworkStream pcmStream, BlockingCollection<float[]> waveBuff, CancellationTokenSource cts)
         {
-            int calls = ModemProgram.secretCarrierFrequency / 1000;
+            //int calls = ModemProgram.secretCarrierFrequency / 1000;
+            int calls = 1;  // init calls to 0 so we begin at the 0th packet
+
+
             while (!cts.Token.IsCancellationRequested)  // Check for cancellation request
             {
                 //Thread.Sleep(200); // for debugging non-real time, should pause a bit
-                (int hr, int spo2) = getNextVals(calls);
-                RunModemProgram(hr, spo2, stream, pcmStream, calls, waveBuff, ModemProgram.secretCarrierFrequency, ModemProgram.voltageAmplitude);
+                (int hr, int spo2, int time_stamp) = getNextVals(calls);
+                RunModemProgram(hr, spo2, time_stamp, stream, pcmStream, calls, waveBuff, ModemProgram.secretCarrierFrequency, ModemProgram.voltageAmplitude);
                 calls++;
 
 
@@ -263,21 +266,29 @@ namespace DelsysSigNIalGen
         // Get the hr&spo2 values from CSVs overloaded for 2 transducers
         public static async Task GetVals(NetworkStream stream, NetworkStream pcmStream, BlockingCollection<float[]> waveBuff, BlockingCollection<float[]> waveBuff2, CancellationTokenSource cts)
         {
-            int calls = ModemProgram.secretCarrierFrequency / 1000;
-            int calls2 = ModemProgram.secretCarrierFrequency2 / 1000;
+            //int start = ModemProgram.secretCarrierFrequency / 1000;
+            //int start2 = ModemProgram.secretCarrierFrequency2 / 1000;
+
+            int start = 1;
+            int start2 = 1;
+
+            // init to zero on both channels. (set up right now for only 1 channel, if second is active, it will have the same data)
+            int calls = start;
+            int calls2 = start2;
+
             while (!cts.Token.IsCancellationRequested)  // Check for cancellation request
             {
                 //Thread.Sleep(200); // for debugging non-real time, should pause a bit
-                (int hr, int spo2) = getNextVals(calls);
-                RunModemProgram(hr, spo2, stream, pcmStream, calls, waveBuff, ModemProgram.secretCarrierFrequency, ModemProgram.voltageAmplitude);
-                (int hr2, int spo22) = getNextVals(calls2);
-                RunModemProgram(hr2, spo22, stream, pcmStream, calls, waveBuff2, ModemProgram.secretCarrierFrequency2, ModemProgram.voltageAmplitude2);
+                (int hr, int spo2, int time_stamp) = getNextVals(calls);
+                RunModemProgram(hr, spo2, time_stamp, stream, pcmStream, calls, waveBuff, ModemProgram.secretCarrierFrequency, ModemProgram.voltageAmplitude);
+                (int hr2, int spo22, int time_stamp2) = getNextVals(calls2);
+                RunModemProgram(hr2, spo22, time_stamp2, stream, pcmStream, calls, waveBuff2, ModemProgram.secretCarrierFrequency2, ModemProgram.voltageAmplitude2);
                 calls++;
                 calls2++;
                 
 
                 // There are currently csvs for 0-1000 values. Reset after reaching the end.
-                if (calls == (ModemProgram.secretCarrierFrequency / 1000) + ModemProgram.numPackets)
+                if (calls == start + ModemProgram.numPackets)
                 {
                     cts.Cancel(); // Cancel the task gracefully after 50 calls
                     break;
@@ -288,28 +299,46 @@ namespace DelsysSigNIalGen
         }
 
         // Loop until we find the next csv call
-        private static (int, int) getNextVals(int calls)
+        private static (int, int, int) getNextVals(int calls)
         {
             int hr = 0;
             int spo2 = 0;
+            int time_stamp = 0;
             // Change this path for your personal computer
-            string filePath = ($"C:\\Users\\TJoe\\Documents\\test_vals\\vals_{calls}.csv");
+            string filePath = ($"C:\\Users\\TJoe\\Documents\\test_vals_DEMO_250218\\vals_{calls}.csv");  // modified this path to be where new files get creates
+            //string filePath = ($"U:\\Users Common\\Ashwin\\hydros csv dump\\vals_{calls}.csv");  // modified this path to be where new files get creates
+
             while (true)
             {
                 try
                 {
                     if (File.Exists(filePath))
                     {
-                        string[] lines = File.ReadAllLines(filePath);
+                        // init var for lines read from csv file
+                        string[] lines;
 
+                        // build in loop to handle if file is open in another process (been created but yet not closed)
+                        while (true) 
+                        {
+                            try
+                            {
+                                lines = File.ReadAllLines(filePath);
+                                break;
+                            }
+                            catch (Exception ex) 
+                            {
+                                Console.WriteLine("Reached the file open but used by another process exception..."); 
+                            };
+                        };
+                       
                         if (lines.Length > 0)
                         {
                             string[] values = lines[0].Split(',');
 
-                            if (values.Length == 2 && int.TryParse(values[0], out hr) && int.TryParse(values[1], out spo2))
+                            if (values.Length == 3 && int.TryParse(values[0], out hr) && int.TryParse(values[1], out spo2) && int.TryParse(values[2], out time_stamp))
                             {
-                                Trace.WriteLine($"Algorithm Vals: {hr}, {spo2}");
-                                return (hr, spo2);
+                                Trace.WriteLine($"Algorithm Vals: {hr}, {spo2} at timestamp {time_stamp}");
+                                return (hr, spo2, time_stamp);
                             }
                             else
                             {
@@ -323,7 +352,7 @@ namespace DelsysSigNIalGen
                     }
                     else
                     {
-                        Console.WriteLine("File does not exist.");
+                        //Console.WriteLine("File does not exist.");
                     }
                 }
                 catch (Exception ex)
@@ -334,10 +363,10 @@ namespace DelsysSigNIalGen
         }
 
         // Send the data and get the encoded waveform
-        public static void RunModemProgram(int heart_rate, int spo2, NetworkStream stream, NetworkStream pcmStream, int calls, BlockingCollection<float[]> waveBuff, int scf, float voltAmp)
+        public static void RunModemProgram(int heart_rate, int spo2, int time_stamp, NetworkStream stream, NetworkStream pcmStream, int calls, BlockingCollection<float[]> waveBuff, int scf, float voltAmp)
         {
             // Send TransmitJSON message and pump 5s zero waveform
-            sendData(heart_rate, spo2, 0, stream);
+            sendData(heart_rate, spo2, time_stamp, 0, stream);
             sendBytes(pcmStream);
 
             // Control messages

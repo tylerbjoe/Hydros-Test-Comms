@@ -36,7 +36,7 @@ public sealed partial class HardwareModel : ObservableObject
             {"AO2"   , new HARDWARE_PIN {PinType="AO" , PinAddress="AO2"}},
             {"AO3"   , new HARDWARE_PIN {PinType="AO" , PinAddress="AO3"}},
             {"AO4"   , new HARDWARE_PIN {PinType="AO" , PinAddress="AO4"}},
-            {"AI0"   , new HARDWARE_PIN {PinType="AI" , PinAddress="AI0"}},
+            {"AI0"   , new HARDWARE_PIN {PinType="AI" , PinAddress="0"}},
             {"AI1"   , new HARDWARE_PIN {PinType="AI" , PinAddress="AI1"}},
             {"AI2"   , new HARDWARE_PIN {PinType="AI" , PinAddress="AI2"}},
             {"AI3"   , new HARDWARE_PIN {PinType="AI" , PinAddress="AI3"}},

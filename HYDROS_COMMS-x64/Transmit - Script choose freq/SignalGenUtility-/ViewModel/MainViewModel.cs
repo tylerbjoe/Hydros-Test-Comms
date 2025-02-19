@@ -493,15 +493,15 @@ partial class MainViewModel : ObservableObject
     [RelayCommand]
     public void PlayData() // Send packets
     {
-        ModemProgram.numTransducers = 2; // number of transducers
+        ModemProgram.numTransducers = 1; // number of transducers
         ModemProgram.sine = 0; // set 0 to not tranmit sine, set 1 to transmit only t1 sine, set 2 to transmit only t2 sine, set 3 to transmit both sine
 
-        ModemProgram.numPackets = 10; // number of packets to send
-        ModemProgram.secretCarrierFrequency = 100000; // Carrier Frequency;
-        ModemProgram.secretCarrierFrequency2 = 101000; // Carrier Frequency;
+        ModemProgram.numPackets = 100_000; // number of packets to send (arbitrarily large)
+        ModemProgram.secretCarrierFrequency = 100_000; // Carrier Frequency Hz;
+        ModemProgram.secretCarrierFrequency2 = 160_000; // Carrier Frequency Hz;
 
-        ModemProgram.voltageAmplitude = 20; // +/- voltageAmplitude is the max/min waveform voltages
-        ModemProgram.voltageAmplitude2 = 10; // +/- voltageAmplitude is the max/min waveform voltages
+        ModemProgram.voltageAmplitude = 8f; // +/- voltageAmplitude is the max/min waveform voltages
+        ModemProgram.voltageAmplitude2 = 8f; // +/- voltageAmplitude is the max/min waveform voltages
 
         ModemProgram.globalStopped = false;
         PlotData.YValues.Clear(); // reset anything that could be read
@@ -509,8 +509,8 @@ partial class MainViewModel : ObservableObject
 
 
         // Scaling Amplitude for DAC
-        ModemProgram.voltageAmplitude = ModemProgram.voltageAmplitude/4; // +/- voltageAmplitude is the max/min waveform voltages
-        ModemProgram.voltageAmplitude2 = ModemProgram.voltageAmplitude2/4; // +/- voltageAmplitude is the max/min waveform voltages
+        ModemProgram.voltageAmplitude = ModemProgram.voltageAmplitude / 4; // +/- voltageAmplitude is the max/min waveform voltages
+        ModemProgram.voltageAmplitude2 = ModemProgram.voltageAmplitude2 / 4; // +/- voltageAmplitude is the max/min waveform voltages
         // Generate encoded waveforms
         CancellationTokenSource cts = new CancellationTokenSource();
         if (ModemProgram.numTransducers == 2)

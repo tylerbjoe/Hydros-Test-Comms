@@ -53,26 +53,40 @@ def integrate_fft_power(freqs, power_spectrum, center_freq=300000, bandwidth=250
     # Integrate (sum) power in the frequency range
     integrated_power = np.sum(power_spectrum[indices])
     return integrated_power
-
+def bandpass_filter(signal, lowcut, highcut, fs, order=5):
+    nyquist = 0.5 * fs  # Nyquist frequency
+    low = lowcut / nyquist
+    high = highcut / nyquist
+    
+    # Design the bandpass filter
+    b, a = butter(order, [low, high], btype='band')
+    
+    # Apply the filter to the signal
+    filtered_signal = filtfilt(b, a, signal)
+    
+    return filtered_signal
 
 #%% Processing multiple packets
 fs = 1_000_000  # Sampling frequency in Hz
 index = [1,10,20]#np.arange(1, 21)  # Packet tx voltages
 packet=[]
+
+trial = "t2 300 1"
 # for ind in index:
-file_path = r"U:\Users Common\TJoe\Brandeis Pool Tests\1.16.25\trial_17.bin"
+file_path = fr"C:\Users\TJoe\OneDrive - Delsys Inc\TJ HYDROS\HYDROS comms\Transducer Port Comparisons\{trial}.bin"
 
 # Load and normalize signal
 out1 = load_signals_from_binary(file_path)
+out1 = bandpass_filter(out1, 250000, 350000, 1000000)
 normalized_out1 = out1 - np.mean(out1)
 # out1=out1[:1000000*3]
 # Compute FFT
 out1_freqs, out1_power_spectrum = get_fft(normalized_out1, fs)
 
 # Integrate power around 100 kHz ± 2.5 kHz
-power_integral = integrate_fft_power(out1_freqs, out1_power_spectrum, center_freq=100000, bandwidth=2500)
+power_integral = integrate_fft_power(out1_freqs, out1_power_spectrum, center_freq=300000, bandwidth=2500)
 
-print(f"t7: Integrated power in {100000} ± {2500} Hz = {power_integral}")
+print(f"{trial}: Integrated power in {300000} ± {2500} Hz = {power_integral}")
 
 # packet.append(power_integral)
 
@@ -80,13 +94,15 @@ print(f"t7: Integrated power in {100000} ± {2500} Hz = {power_integral}")
 # Plot the frequency spectrum
 plt.figure(figsize=(10, 6))
 plt.plot(out1_freqs, out1_power_spectrum)
-plt.title("trial 17 300kHz")
+plt.title(f"{trial} 30")
 plt.xlabel("Frequency (Hz)")
 plt.ylabel("Magnitude")
 plt.grid()
 plt.show()
 
-
+#%%
+# plt.figure()
+# plt.plot(out1)
 #%% Plot sft
 # Zxx = zxx[::2, ::2]
 # f = out1_sfreqs[::2]
@@ -125,32 +141,37 @@ plt.show()
 # plt.show()
     
 #%% Packet Saver 
-import numpy as np
+# import numpy as np
 
-# Specify the input and output file names
-input_file = r"U:\Users Common\TJoe\Brandeis Pool Tests\2.6.25\trial_13.bin"
-output_file = r"U:\Users Common\TJoe\Brandeis Pool Tests\2.6.25\trial_13_packets\start_noise.bin"
+# # Specify the input and output file names
+# input_file = r"U:\Users Common\TJoe\Brandeis Pool Tests\2.6.25\trial_13.bin"
+# output_file = r"U:\Users Common\TJoe\Brandeis Pool Tests\2.6.25\trial_13_packets\start_noise.bin"
 
-# Define the data type; adjust as needed (e.g., np.float32 or np.float64)
-dtype = np.float32
+# # Define the data type; adjust as needed (e.g., np.float32 or np.float64)
+# dtype = np.float32
 
-# Read the entire binary file into a NumPy array
-data = np.fromfile(input_file, dtype=dtype)
-print("Original data:", data)
+# # Read the entire binary file into a NumPy array
+# data = np.fromfile(input_file, dtype=dtype)
+# print("Original data:", data)
 
-# Slice the array as needed; for example, take elements from index 10 to 20
-splice = data[int(0.01e7):int(0.26e7)]
-print("Spliced data:", splice)
+# # Slice the array as needed; for example, take elements from index 10 to 20
+# splice = data[int(0.01e7):int(0.26e7)]
+# print("Spliced data:", splice)
 
-# Save the spliced array to a new binary file
-splice.tofile(output_file)
-print(f"Spliced data saved to {output_file}")
+# # Save the spliced array to a new binary file
+# splice.tofile(output_file)
+# print(f"Spliced data saved to {output_file}")
 
+vs = [1,10,20]
 
-
-
-
-
+plt.figure()
+plt.title("Tx 1 vs Tx 2 300kHz")
+plt.xlabel('Tx Voltage (V)')
+plt.ylabel('Rx Power Spectral Density at 300kHz (V^2)')
+plt.plot(vs,[1.946,19.859,39.583],label="Tx1")
+plt.plot(vs,[1.848,18.548,37.201],label="Tx2")
+plt.legend()
+plt.show()
 
 
 
