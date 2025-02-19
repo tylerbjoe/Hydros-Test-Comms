@@ -11,7 +11,6 @@ namespace DelsysSigNIalGen.View
         {
             InitializeComponent();
             ValuePlot.InitializeValuePlot(LineRenderableSeries1, LineRenderableSeries2);
-            rangebox.SelectedIndex = 1;
         }
 
         private void TextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)

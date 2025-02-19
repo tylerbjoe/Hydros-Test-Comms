@@ -11,14 +11,10 @@ using MathNet.Filtering;
 using MathNet.Numerics;
 using Microsoft.Win32;
 using NAudio.Wave;
-using Newtonsoft.Json.Linq;
 using Plotter.ViewModel.Plots;
 using Plotter.ViewModel.RenderableSeries;
 using SciChart.Charting.Model.DataSeries;
-using SciChart.Charting.Visuals;
 using SciChart.Core.Extensions;
-using SciChart.Data.Model;
-using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Globalization;
@@ -26,19 +22,6 @@ using System.IO;
 using System.Net.Sockets;
 using System.Windows;
 using System.Windows.Data;
-using MathNet.Numerics.IntegralTransforms;
-using MathNet.Filtering.FIR;
-using MathNet.Filtering.Windowing;
-using System.Reactive.Subjects;
-using Org.BouncyCastle.Bcpg;
-using System.Windows.Media.Imaging;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using static CommunityToolkit.Mvvm.ComponentModel.__Internals.__TaskExtensions.TaskAwaitableWithoutEndValidation;
-using System.Security.Policy;
-using Microsoft.VisualBasic.ApplicationServices;
-using System.Security.Cryptography;
-using System.Windows.Markup;
-using System.Collections;
 
 namespace DelsysSigNIalGen.ViewModel;
 
@@ -115,7 +98,7 @@ partial class MainViewModel : ObservableObject
         _timer = new Timer(Timerfunction, null, 1000, 1000);
 
         Task.Run(()=>Consumer());
-        Task.Run(() => WriterThread());
+        //Task.Run(() => WriterThread());
     }
 
     partial void OnIsContinuousChanged(bool oldValue, bool newValue)
@@ -225,7 +208,7 @@ partial class MainViewModel : ObservableObject
         }
         if (!IsContinuous)
         {
-            Task.Run(() => WriterThread());
+            //Task.Run(() => WriterThread());
         }
         _ff.AIRead.StartAnalogRead(range, [..pins], pins.Last());
     }

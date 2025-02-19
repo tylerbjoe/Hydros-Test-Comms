@@ -616,8 +616,8 @@ namespace DelsysSigNIalGen
                     scaledValues[i] = Map(sigout[i], inputMin, inputMax, outputMin, outputMax);  // s(t) rescaled to DAC voltages
                 }
                 // Save scaledValues as a binary file
-                string binaryPath = "C:\\Users\\TJoe\\OneDrive - Delsys Inc\\TJ HYDROS\\HYDROS comms\\laptop demod\\scaledValues300.bin";
-                SaveArrayToBinary(binaryPath, scaledValues);
+                //string binaryPath = "C:\\Users\\TJoe\\OneDrive - Delsys Inc\\TJ HYDROS\\HYDROS comms\\laptop demod\\scaledValues300.bin";
+                //SaveArrayToBinary(binaryPath, scaledValues);
 
 
                 waveBuff.Add(scaledValues);
@@ -706,7 +706,7 @@ namespace DelsysSigNIalGen
         }
         private static void SaveArrayToCsv(string csvPath, float[] cutArray)
         {
-            // Check if the file exists
+            // Check if the file existssecret
             if (!File.Exists(csvPath))
             {
                 // Create CSV and add the first column

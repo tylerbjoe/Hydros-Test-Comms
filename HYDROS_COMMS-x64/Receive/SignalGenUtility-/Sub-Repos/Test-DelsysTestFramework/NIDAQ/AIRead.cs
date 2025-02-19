@@ -187,11 +187,8 @@ namespace DelsysTestFramework.NIDAQ
             double[] yValues = Array.Empty<double>(); ;
             if (mode == "File")
             {
-
-                //string filePath = "U:\\Users Common\\TJoe\\Brandeis Pool Tests\\1.16.25\\trial_23.bin";
-                //string filePath = "C:\\Users\\TJoe\\OneDrive - Delsys Inc\\TJ HYDROS\\HYDROS comms\\laptop demod\\t23bp.bin";
-                //string filePath = "U:\\Users Common\\TJoe\\Brandeis Pool Tests\\2.6.25\\trial_13_packets\\packet_2.bin";
                 string filePath = "U:\\Users Common\\TJoe\\Brandeis Pool Tests\\2.6.25\\trial_13.bin";
+
 
                 using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
                 using (BinaryReader reader = new BinaryReader(fs))

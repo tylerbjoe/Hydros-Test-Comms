@@ -13,6 +13,9 @@ namespace DelsysSigNIalGen.ViewModel;
 partial class MainViewModel : ObservableObject
 {
     [ObservableProperty]
+    private string _LastHeartRate;
+
+    [ObservableProperty]
     private List<string> _AI_Names;
 
     [ObservableProperty]
@@ -94,7 +97,7 @@ partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private int _signalShape;
     [ObservableProperty]
-    private string _analogInChannel;
+    private string _analogInChannel = "0";
     [ObservableProperty]
     private string _AnalogInRange;
 

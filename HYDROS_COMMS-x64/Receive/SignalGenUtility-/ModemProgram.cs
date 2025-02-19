@@ -219,6 +219,9 @@ namespace DelsysSigNIalGen
             return (streamDec, pcmStreamDec, clientDec, pcmClientDec);
         }
 
+
+        public static int rolloverint = 0;
+        public static int last = 0;
         // Continuously reads messages from control port, looking for Data messages
         public static async Task decodeControls(NetworkStream streamDec)
         {
@@ -244,10 +247,21 @@ namespace DelsysSigNIalGen
                 }
                 if (values != null)
                 {
-                    Trace.WriteLine($"hr: {values[0]}, spo2: {values[1]}");
+                    //if (values.Count == 2)
+                    //{
+                    //    values.Add(calls);
+                    //}
+
+                    if (last > values[2]) // this handels it wrapping at 255 (but we might be missing some packets lol)
+                    {
+                        rolloverint += 255;
+                    }
+
+                    Trace.WriteLine($"time: {values[2]} hr: {values[0]}, spo2: {values[1]}"); // the last thing on the list will be the time stamp that it was sent for
                     // Adds to Plot
-                    ValuePlot.AppendData((calls, values[0]), (calls, values[1]));
+                    ValuePlot.AppendData(((values[2] + rolloverint), values[0]), ((values[2] + rolloverint), values[1]));
                     calls++;
+                    last = values[2];
                 }
             }
             decodeThread = false;
@@ -268,7 +282,12 @@ namespace DelsysSigNIalGen
         // Should decode the values [60, 95]
         public static void sendCSV(NetworkStream stream, NetworkStream pcmStream, int calls)
         {
+<<<<<<< Updated upstream
             string filePath = $"C:\\Users\\TJoe\\OneDrive - Delsys Inc\\TJ HYDROS\\HYDROS comms\\test_vals\\DownOut_RT_0.csv";
+=======
+            string filePath = $"C:\\Users\\TJoe\\OneDrive - Delsys Inc\\TJ HYDROS\\HYDROS comms\\test_vals\\DownOut_RT_0.csv"
+ ;
+>>>>>>> Stashed changes
             List<float> floatList = new List<float>();
 
             // Read the CSV file
