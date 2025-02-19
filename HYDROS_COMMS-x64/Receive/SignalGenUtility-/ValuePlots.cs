@@ -1,27 +1,18 @@
-﻿using SciChart.Charting.Visuals;
-using SciChart.Charting.Model.DataSeries.Heatmap2DArrayDataSeries;
-using SciChart.Charting.Visuals.RenderableSeries;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Threading;
-using SciChart.Charting.Model.DataSeries;
-using MathNet.Numerics.IntegralTransforms;
-using System.Numerics;
-using SciChart.Charting.Visuals.Axes;
-using SciChart.Data.Model;
+﻿using System;
 using System.Diagnostics;
-using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json.Linq;
-using DelsysNICommon;
+using SciChart.Charting.Model.DataSeries;
+using SciChart.Charting.Visuals.RenderableSeries;
 
 namespace DelsysSigNIalGen
 {
-    public class ValuePlot // Simple Line Plots added. One for hr, one for spo2
+    public class ValuePlot
     {
         private static XyDataSeries<int, int> dataSeries1;
         private static XyDataSeries<int, int> dataSeries2;
 
+        // Event to notify UI when new SPO2 value is available
+        public static event Action<int> OnSpo2Updated;
+        public static event Action<int> OnHRUpdated;
 
         public static void InitializeValuePlot(FastLineRenderableSeries lineRenderableSeries1, FastLineRenderableSeries lineRenderableSeries2)
         {
@@ -36,11 +27,15 @@ namespace DelsysSigNIalGen
         {
             AppendDataToSeries(dataSeries1, tuple1);
             AppendDataToSeries(dataSeries2, tuple2);
+
+            // Trigger the event with the latest SPO2 value
+            OnSpo2Updated?.Invoke(tuple2.Item2);
+            OnHRUpdated?.Invoke(tuple1.Item2);
         }
 
         private static void AppendDataToSeries(XyDataSeries<int, int> series, (int, int) tuple)
         {
-            series.Append(tuple.Item1, tuple.Item2); // call, val
+            series.Append(tuple.Item1, tuple.Item2);
             Trace.WriteLine($"PLOTTED: {tuple.Item1}, {tuple.Item2}");
         }
 
@@ -51,5 +46,3 @@ namespace DelsysSigNIalGen
         }
     }
 }
-
-

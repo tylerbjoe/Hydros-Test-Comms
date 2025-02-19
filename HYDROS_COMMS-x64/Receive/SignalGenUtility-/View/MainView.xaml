@@ -140,12 +140,20 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}"
-                               Margin="10"
+                               Margin="10,10,601,10"
                                Foreground="CadetBlue"
-                               Text="Heart Rate"
+                               Text="Heart Rate:"
                                    Grid.Row="0"
                                    FontSize="25"
                                />
+                    <TextBlock x:Name="HRTextBlock"
+                               Style="{StaticResource MaterialDesignBody1TextBlock}"
+                               Margin="155,10,480,10"
+                               Foreground="CadetBlue"
+                               Text="--"
+                               Grid.Row="0"
+                               FontSize="25"/>
+                    
                     <!-- First new plot -->
                     <sciChart:SciChartSurface x:Name="LinePlotSurface1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10" Grid.Row="1">
                         <sciChart:SciChartSurface.Annotations>
@@ -188,13 +196,14 @@
                                FontSize="25"
                                />
 
-                    <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}"
-                               Margin="95,10,500,10"
-                               Foreground="CadetBlue"
-                               Text="000"
-                               Grid.Row="2"
-                               FontSize="25"
-                               />
+                    <TextBlock x:Name="SPO2TextBlock"
+                       Style="{StaticResource MaterialDesignBody1TextBlock}"
+                       Margin="95,10,500,10"
+                       Foreground="CadetBlue"
+                       Text="--"
+                       Grid.Row="2"
+                       FontSize="25"/>
+
                     <!-- Second new plot -->
 
                     <sciChart:SciChartSurface x:Name="LinePlotSurface2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10" Grid.Row="4">
