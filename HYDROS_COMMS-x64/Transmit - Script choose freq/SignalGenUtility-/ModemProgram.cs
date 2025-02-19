@@ -305,8 +305,8 @@ namespace DelsysSigNIalGen
             int spo2 = 0;
             int time_stamp = 0;
             // Change this path for your personal computer
-            string filePath = ($"C:\\Users\\TJoe\\Documents\\test_vals_DEMO_250218\\vals_{calls}.csv");  // modified this path to be where new files get creates
-            //string filePath = ($"U:\\Users Common\\Ashwin\\hydros csv dump\\vals_{calls}.csv");  // modified this path to be where new files get creates
+            //string filePath = ($"C:\\Users\\TJoe\\Documents\\test_vals_DEMO_250218\\vals_{calls}.csv");  // modified this path to be where new files get creates
+            string filePath = ($"U:\\Users Common\\Ashwin\\hydros csv dump\\vals_{calls}.csv");  // modified this path to be where new files get creates
 
             while (true)
             {
