@@ -17,7 +17,7 @@
         TextOptions.TextRenderingMode="Auto"
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}"
-        Height="1439" Width="1900">
+        Height="1101" Width="1900">
     <!--Height="1356" Width="1140">-->
     <Window.Resources>
         <ResourceDictionary>
@@ -52,19 +52,8 @@
                         <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}"
                                Margin="10"
                                Foreground="White"
-                               Text="{StaticResource AppTitle}" />
-                        <CheckBox Content="Is NI Connected" Style="{StaticResource MaterialDesignFilterChipCheckBox}" HorizontalAlignment="Center" IsChecked="{Binding Hw.IS_NI_CONNECTED}" Command="{Binding ConnectNICardCommand}"/>
-
-                        <ComboBox 
-                        Foreground="White"
-                SelectedIndex="{Binding SignalFrom}"
-                Grid.Column="1" Margin="10" x:Name="OutputMode"
-                          materialDesign:HintAssist.Hint="Select Output Mode"
-                              Style="{StaticResource MaterialDesignOutlinedComboBox}"
-                          >
-                            <ComboBoxItem Content="Wave from File"/>
-                            <ComboBoxItem Content="Generated Wave"/>
-                        </ComboBox>
+                               Text="HYDROS Dev. App"
+                               />
                         <StackPanel Orientation="Horizontal" Margin="0" HorizontalAlignment="Center" >
                             <TextBox materialDesign:HintAssist.Hint="Samples to Keep in Memory" 
              Style="{StaticResource MaterialDesignFilledTextBox}"
@@ -73,43 +62,7 @@
              Text="{Binding SamplesInMemory, StringFormat='{}{0:0,0}'}"
              materialDesign:HintAssist.Foreground="White" Width="240"/>
                         </StackPanel>
-                        <StackPanel
-                          Margin="5"
-                          Orientation="Horizontal"
-                            HorizontalAlignment="Center"
-                         >
-                            <RadioButton
-                            Margin="1"
-                            Content="Windowed"
-                            IsChecked="{Binding IsContinuous}"
-                            Style="{StaticResource MaterialDesignTabRadioButton}" />
-                            <RadioButton
-                            Margin="1"
-                            Content="Recording"
-                            IsChecked="{Binding IsContinuous, Converter={StaticResource InvertBooleanConverter}}"
-                            Style="{StaticResource MaterialDesignTabRadioButton}" Width="100" />
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal" Margin="10"
-            Visibility="{Binding IsContinuous, Converter={StaticResource BooleanInverterAndVisibilityConverter}}">
-                            <TextBox materialDesign:HintAssist.Hint="CSV Location"
-             Text="{Binding DataFilePath}"
-             Style="{StaticResource MaterialDesignFilledTextBox}"
-             Margin="10"
-             Foreground="White"
-             materialDesign:HintAssist.Foreground="White" Width="134"/>
-                            <Button Content="Change&#xD;&#xA; Save &#xD;&#xA;Location" Height="60" Command="{Binding ChangeSaveFileLocationCommand}"/>
-                        </StackPanel>
                         <!--OutputLog Below-->
-                        <StackPanel Orientation="Horizontal" Margin="10">
-                            <TextBox materialDesign:HintAssist.Hint="Modem Log Location"
-                             Text="{Binding LogFilePath}"
-                             Style="{StaticResource MaterialDesignFilledTextBox}"
-                             Margin="10"
-                             Foreground="White"
-                             materialDesign:HintAssist.Foreground="White" Width="134"/>
-                            <Button Content="Change&#xD;&#xA; Save &#xD;&#xA;Location" Height="60" Command="{Binding ChangeSaveFileLogLocationCommand}"/>
-                        </StackPanel>
                         <!--Carrier Frequency-->
                         <StackPanel Orientation="Horizontal" Margin="10">
                             <TextBox materialDesign:HintAssist.Hint="Carrier Frequency"
@@ -122,343 +75,145 @@
                         </StackPanel>
                     </StackPanel>
                 </materialDesign:Card>
-
-                <materialDesign:Card Margin="0,10,0,10">
+                <materialDesign:Card  
+                Margin="0,10,0,10"
+                Visibility="{Binding IsFromFile, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <StackPanel>
-                        <TextBlock 
-                        Text="Analog In Settings"
-                        Foreground="White"
-                        Margin="5" FontWeight="Bold"/>
-                        <StackPanel Orientation="Horizontal">
-                            <ComboBox Grid.Column="1" Margin="10" x:Name="analogInChannel"
+                        <StackPanel Orientation="Horizontal"/>
+                        <ComboBox Grid.Column="1" Margin="10" x:Name="analogInChannel"
                                materialDesign:HintAssist.Hint="Channel "
                               Style="{StaticResource MaterialDesignOutlinedComboBox}"
                               Width="140"
-                                      SelectedIndex="9"
+                                      SelectedIndex="0"
                                       SelectedValue="{Binding AnalogInChannel}"
                                   ItemsSource="{Binding AI_Names}"
                                   Foreground="White"
                                       IsEnabled="{Binding IsAnalogInNotRunning}"
                           />
-                            <ComboBox x:Name="rangebox" Grid.Column="1" Margin="0,10,10,10"
-                               materialDesign:HintAssist.Hint="Range"
-                              Style="{StaticResource MaterialDesignOutlinedComboBox}"
-                                      SelectedValue="{Binding AnalogInRange, UpdateSourceTrigger=PropertyChanged}"
-                                                                    Foreground="White" 
-                                      SelectedValuePath="Content"
-                                      IsEnabled="{Binding IsAnalogInNotRunning}"
+                        <Button Content="Start" Command="{Binding ListenDecodeCommand}" Margin="10"/>
+                        <Button Content="Stop" 
+                                Command="{Binding StopNICardCommand}" Margin="10" IsEnabled="{Binding IsAnalogInRunning}"/>
 
-                          >
-                                <ComboBoxItem Content="± 10 V"/>
-                                <ComboBoxItem Content="± 5 V"/>
-                                <ComboBoxItem Content="± 2 V"/>
-                                <ComboBoxItem Content="± 1 V"/>
-                                <ComboBoxItem Content="± 0.2 V "/>
-                                <ComboBoxItem Content="± 0.1 V"/>
-                            </ComboBox>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBox
-                                                        Text="{Binding AISampleRate, StringFormat='{}{0:0,0}'}"
-                                  Foreground="White"
-
-                            Margin="10"
-                    VerticalAlignment="Top"
-                    materialDesign:HintAssist.Hint="Sample Rate (Hz)"
-                    AcceptsReturn="False"
-                    Style="{StaticResource MaterialDesignFilledTextBox}"
-                    TextWrapping="NoWrap" Width="120"
-                                IsEnabled="{Binding IsAnalogInNotRunning}"
-                    />
-                            <TextBox
-                                    Text="{Binding AIPullRate, StringFormat='{}{0:0,0}'}"
-              Foreground="White"
-
-        Margin="10"
-VerticalAlignment="Top"
-materialDesign:HintAssist.Hint="Pull Rate"
-AcceptsReturn="False"
-Style="{StaticResource MaterialDesignFilledTextBox}"
-TextWrapping="NoWrap" Width="95"
-                                IsEnabled="{Binding IsAnalogInNotRunning}"
-/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <ComboBox Grid.Column="1" Margin="10"
-                               materialDesign:HintAssist.Hint="Collection Style "
-                              Style="{StaticResource MaterialDesignOutlinedComboBox}"
-                              SelectedIndex="{Binding AnalogInChannel}" Width="240"
-                                                                Foreground="White" IsEnabled="False"
-
-                          >
-                                <ComboBoxItem Content="RSE"/>
-                                <ComboBoxItem Content="NRSE"/>
-                                <ComboBoxItem Content="P"/>
-                            </ComboBox>
-
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal"
-                                Margin="10">
-                            <Button Content="Start" Margin="0,0,10,0" 
-                                Command="{Binding StartNICardCommand}" Width="115" IsEnabled="{Binding IsAnalogInNotRunning}"/>
-                            <Button Content="Stop"  Margin="0,0,10,0"
-                                Command="{Binding StopNICardCommand}" Width="115" IsEnabled="{Binding IsAnalogInRunning}"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal"
-                                Margin="10">
-                            <Button Content="Go to live" 
-                                FontSize="12"
-                                     Margin="0,0,10,0" 
-                            Command="{Binding GoToLiveLineCommand}" Width="115"/>
-                            <Button Content="Export to .bin" 
-                                FontSize="12"
-                                     Margin="0,0,0,0" 
-                            Command="{Binding ExportToBinaryCommand}" Width="115"/>
-                        </StackPanel>
-
-
-                        <CheckBox Content="Differential Input"
-                              Foreground="White"
-                              Margin="10,0,0,10" IsEnabled="False"/>
-                        <CheckBox Content="Zoom Extentes" 
-                              Foreground="White"
-                              Margin="10,0,0,10" 
-                              IsChecked="{Binding ZoomExtents}"/>
-
-                    </StackPanel>
-                </materialDesign:Card>
-                <materialDesign:Card  
-                Margin="0,10,0,10"
-                Visibility="{Binding IsCalculatedShape, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <StackPanel>
-                        <TextBlock 
-                        Text="Waveform Generation Config."
-                        Foreground="White"
-                        Margin="5" FontWeight="Bold"/>
-                        <ComboBox Grid.Column="1" Margin="10" x:Name="signalShape"
-                               materialDesign:HintAssist.Hint="Signal Shape"
-                              Style="{StaticResource MaterialDesignOutlinedComboBox}"
-                              SelectedIndex="{Binding SignalShape}"
-                                                                Foreground="White"
-
-                          >
-                            <ComboBoxItem Content="Sine Wave"/>
-                            <ComboBoxItem Content="Saw Wave"/>
-                            <ComboBoxItem Content="DC"/>
-                            <ComboBoxItem Content="Square Wave"/>
-                            <ComboBoxItem Content="Triangle Wave"/>
-                        </ComboBox>
-                        <StackPanel Orientation="Horizontal" Margin="5,0,0,0">
-                            <TextBox
-                                                        Text="{Binding Amplitude}"
-                                  Foreground="White"
-
-                    Margin="5"
-                            Width="120"
-                    VerticalAlignment="Top"
-                    materialDesign:HintAssist.Hint="Amplitude"
-                    AcceptsReturn="False"
-                    Style="{StaticResource MaterialDesignFilledTextBox}"
-                    TextWrapping="NoWrap"
-                    />
-                            <TextBox
-                            Text="{Binding Frequency}"
-                    Margin="5"
-                                                              Foreground="White"
-
-                            Width="110"
-                    VerticalAlignment="Top"
-                    materialDesign:HintAssist.Hint="Frequency"
-                    AcceptsReturn="False"
-                    Style="{StaticResource MaterialDesignFilledTextBox}"
-                    TextWrapping="NoWrap"
-                    />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="5,0,0,5">
-                            <TextBox
-                    Text="{Binding DcOffset}"
-                    Margin="5"
-                                                              Foreground="White"
-
-                            Width="115"
-                    VerticalAlignment="Top"
-                    materialDesign:HintAssist.Hint="DC offset"
-                    AcceptsReturn="False"
-                    Style="{StaticResource MaterialDesignFilledTextBox}"
-                    TextWrapping="NoWrap"
-                    />
-                            <Button Content="Start" Margin="5" Width="100"
-                        
-                                Style="{StaticResource MaterialDesignOutlinedSecondaryDarkButton}"
-                                Command="{Binding SetSignalOnLineCommand}"/>
-                        </StackPanel>
-
-                    </StackPanel>
-                </materialDesign:Card>
-                <materialDesign:Card  
-                Margin="0,10,0,10"
-                Visibility="{Binding IsFromFile, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <StackPanel>
-                        <TextBlock 
-                        Text=".Wav file control"
-                        Foreground="White"
-                        Margin="5" FontWeight="Bold"/>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBox
-                        IsReadOnly="True"
-                            Text="{Binding WavFileLocation}"
-                                                          Foreground="White"
-
-                    Margin="10"
-                            Width="150"
-                    materialDesign:HintAssist.Hint="File Path"
-                    AcceptsReturn="False"
-                    Style="{StaticResource MaterialDesignFilledTextBox}"
-                    TextWrapping="NoWrap"
-                    />
-
-                            <Button Content="Find File" Command="{Binding OpenWavFileCommand}"/>
-                        </StackPanel>
-                        <TextBox
-                                                        Text="{Binding AOSampleRate, StringFormat='{}{0:0,0}'}"
-                                  Foreground="White"
-
-                    Margin="5"
-                    VerticalAlignment="Top"
-                    materialDesign:HintAssist.Hint="Output Sample Rate"
-                    AcceptsReturn="False"
-                            IsEnabled="{Binding WavFileSelected}"
-                    Style="{StaticResource MaterialDesignFilledTextBox}"
-                    TextWrapping="NoWrap"
-                    />
-                        <Button Content="Listen and Decode" Command="{Binding ListenDecodeCommand}" Margin="10"/>
-                        <Button Content="Play File Waveform Once" Margin="10" IsEnabled="{Binding WavFileSelected}"
-                                Command="{Binding RunWavFormOnceCommand}"/>
-                        <Button Content="Play File Waveform Repeating" Margin="10" IsEnabled="{Binding WavFileSelected}"
-                                Command="{Binding RepeatFileCommand}"/>
-
-                    </StackPanel>
-                </materialDesign:Card>
-                <materialDesign:Card Margin="0,10,0,10"
-                                 Visibility="{Binding IsCalculatedShape, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <StackPanel>
-                        <TextBlock 
-                        Text="Frequency Sweep Config."
-                        Foreground="White"
-                        Margin="5" FontWeight="Bold"/>
-                        <StackPanel Orientation="Horizontal" Margin="5,0,0,0">
-                            <TextBox
-                                                        Text="{Binding SweepStartFreq}"
-                                  Foreground="White"
-
-                    Margin="5"
-                            Width="100"
-                    VerticalAlignment="Top"
-                    materialDesign:HintAssist.Hint="Start Freq."
-                    AcceptsReturn="False"
-                    Style="{StaticResource MaterialDesignFilledTextBox}"
-                    TextWrapping="NoWrap"
-                    />
-                            <TextBox
-                            Text="{Binding SweepEndFreq}"
-                    Margin="5"
-                                                              Foreground="White"
-
-                            Width="100"
-                    VerticalAlignment="Top"
-                    materialDesign:HintAssist.Hint="Stop Freq."
-                    AcceptsReturn="False"
-                    Style="{StaticResource MaterialDesignFilledTextBox}"
-                    TextWrapping="NoWrap"
-                    />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="5,0,0,0">
-                            <TextBox
-                                                        Text="{Binding SweepStep}"
-                                  Foreground="White"
-
-                    Margin="5"
-                            Width="100"
-                    VerticalAlignment="Top"
-                    materialDesign:HintAssist.Hint="Periods per Frequency"
-                    AcceptsReturn="False"
-                    Style="{StaticResource MaterialDesignFilledTextBox}"
-                    TextWrapping="NoWrap"
-                    />
-                            <TextBox
-                                                        Text="{Binding SweepAmplitude}"
-                                  Foreground="White"
-
-                    Margin="5"
-                            Width="100"
-                    VerticalAlignment="Top"
-                    materialDesign:HintAssist.Hint="Amplitude"
-                    AcceptsReturn="False"
-                    Style="{StaticResource MaterialDesignFilledTextBox}"
-                    TextWrapping="NoWrap"
-                    />
-                        </StackPanel>
-                        <Button Content="Start Sweep" Margin="10" Command="{Binding StartSweepCommand}"/>
                     </StackPanel>
                 </materialDesign:Card>
             </StackPanel>
         </ScrollViewer>
-        <DockPanel Grid.Column="1" Margin="10"
-                   VerticalAlignment="Stretch"
-                   HorizontalAlignment="Stretch">
+        <Grid Grid.Column="1" Margin="10">
             <materialDesign:Card Margin="10" 
                                  Height="auto"
                                  Width="auto"
                                  VerticalAlignment="Stretch"
                                  HorizontalAlignment="Stretch">
-                <plots:SingleSurfacePlot x:Name="PlotContainer" 
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}"
+                               Margin="10"
+                               Foreground="White"
+                               Text="Acoustic waveform in Time Domain"
+                                   Grid.Row="0"
+                               FontSize="25"
+                               />
+                    <plots:SingleSurfacePlot x:Name="PlotContainer" 
                                                 DataContext="{Binding PlotViewModel}" 
                                          VerticalAlignment="Stretch"
                                          HorizontalAlignment="Stretch"
                                          Margin="10"
+                                                                          Grid.Row="1"
+
                                          >
-                </plots:SingleSurfacePlot>
+                    </plots:SingleSurfacePlot>
+                </Grid>
             </materialDesign:Card>
-        </DockPanel>
+        </Grid>
         <!--ADDING SECOND SURFACE-->
-        <DockPanel Grid.Column="2" Margin="10,10,10,0" VerticalAlignment="Top" Height="894">
+        <Grid Grid.Column="2" Margin="10">
             <materialDesign:Card Margin="10" Height="auto" Width="auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                 <!-- Container for the two vertically stacked plots -->
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="50" />
                         <RowDefinition Height="*" />
+                        <RowDefinition Height="50" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-
+                    <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}"
+                               Margin="10"
+                               Foreground="CadetBlue"
+                               Text="Heart Rate"
+                                   Grid.Row="0"
+                                   FontSize="25"
+                               />
                     <!-- First new plot -->
-                    <sciChart:SciChartSurface x:Name="LinePlotSurface1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10" Grid.Row="0">
+                    <sciChart:SciChartSurface x:Name="LinePlotSurface1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10" Grid.Row="1">
+                        <sciChart:SciChartSurface.Annotations>
+                            <sciChart:TextAnnotation X1="5" Y1="0.5" 
+                          Text="Sample Annotation"
+                          FontSize="16"
+                          Foreground="CadetBlue"
+                          HorizontalAnchorPoint="Left"
+                          VerticalAnchorPoint="Center"/>
+                        </sciChart:SciChartSurface.Annotations>
+                        <sciChart:SciChartSurface.GridLinesPanelStyle>
+                            <Style TargetType="sciChart:GridLinesPanel">
+                                <Setter Property="Padding" Value="20" />
+                            </Style>
+                        </sciChart:SciChartSurface.GridLinesPanelStyle>
+
                         <sciChart:SciChartSurface.XAxis>
-                            <SciChart:NumericAxis AxisAlignment="Bottom" AxisTitle="" AutoRange="Always" />
+                            <SciChart:NumericAxis AxisAlignment="Bottom" AxisTitle="Time" AutoRange="Always" />
                         </sciChart:SciChartSurface.XAxis>
                         <sciChart:SciChartSurface.YAxis>
-                            <SciChart:NumericAxis AxisAlignment="Right" AxisTitle="HR (bpm)" AutoRange="Always" />
+                            <SciChart:NumericAxis AxisAlignment="Right" AxisTitle="HR (bpm)" AutoRange="Never" VisibleRange="35, 200"/>
                         </sciChart:SciChartSurface.YAxis>
+
                         <sciChart:SciChartSurface.RenderableSeries>
                             <!-- Add your line series here -->
-                            <sciChart:FastLineRenderableSeries x:Name="LineRenderableSeries1" Stroke="White" StrokeThickness="3" />
+                            <sciChart:FastLineRenderableSeries x:Name="LineRenderableSeries1" Stroke="CadetBlue" StrokeThickness="3">
+                                <sciChart:FastLineRenderableSeries.PointMarker>
+                                    <sciChart:EllipsePointMarker Width="8" Height="8" Fill="CadetBlue"/>
+                                </sciChart:FastLineRenderableSeries.PointMarker>
+                            </sciChart:FastLineRenderableSeries>
                         </sciChart:SciChartSurface.RenderableSeries>
+
                     </sciChart:SciChartSurface>
 
+                    <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}"
+                               Margin="10"
+                               Foreground="CadetBlue"
+                               Text="SPO2:"
+                                   Grid.Row="2"
+                               FontSize="25"
+                               />
                     <!-- Second new plot -->
-                    <sciChart:SciChartSurface x:Name="LinePlotSurface2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10" Grid.Row="1">
+
+                    <sciChart:SciChartSurface x:Name="LinePlotSurface2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10" Grid.Row="4">
+                        <sciChart:SciChartSurface.GridLinesPanelStyle>
+                            <Style TargetType="sciChart:GridLinesPanel">
+                                <Setter Property="Padding" Value="20" />
+                            </Style>
+                        </sciChart:SciChartSurface.GridLinesPanelStyle>
+
                         <sciChart:SciChartSurface.XAxis>
-                            <SciChart:NumericAxis AxisAlignment="Bottom" AxisTitle="" AutoRange="Always" />
+                            <SciChart:NumericAxis AxisAlignment="Bottom" AxisTitle="Time" AutoRange="Always" />
                         </sciChart:SciChartSurface.XAxis>
                         <sciChart:SciChartSurface.YAxis>
-                            <SciChart:NumericAxis AxisAlignment="Right" AxisTitle="SPO2 (%)" AutoRange="Always" />
+                            <SciChart:NumericAxis AxisAlignment="Right" AxisTitle="SPO2 (%)" AutoRange="Never" VisibleRange="70, 105" />
                         </sciChart:SciChartSurface.YAxis>
+
                         <sciChart:SciChartSurface.RenderableSeries>
                             <!-- Add your line series here -->
-                            <sciChart:FastLineRenderableSeries x:Name="LineRenderableSeries2" Stroke="White" StrokeThickness="3" />
+                            <sciChart:FastLineRenderableSeries x:Name="LineRenderableSeries2" Stroke="CadetBlue" StrokeThickness="3">
+                                <sciChart:FastLineRenderableSeries.PointMarker>
+                                    <sciChart:EllipsePointMarker Width="8" Height="8" Fill="CadetBlue"/>
+                                </sciChart:FastLineRenderableSeries.PointMarker>
+                            </sciChart:FastLineRenderableSeries>
                         </sciChart:SciChartSurface.RenderableSeries>
                     </sciChart:SciChartSurface>
                 </Grid>
             </materialDesign:Card>
-        </DockPanel>
+        </Grid>
     </Grid>
 </Window>

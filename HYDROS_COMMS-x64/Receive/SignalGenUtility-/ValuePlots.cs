@@ -22,6 +22,7 @@ namespace DelsysSigNIalGen
         private static XyDataSeries<int, int> dataSeries1;
         private static XyDataSeries<int, int> dataSeries2;
 
+
         public static void InitializeValuePlot(FastLineRenderableSeries lineRenderableSeries1, FastLineRenderableSeries lineRenderableSeries2)
         {
             dataSeries1 = new XyDataSeries<int, int> { SeriesName = "Hr" };
