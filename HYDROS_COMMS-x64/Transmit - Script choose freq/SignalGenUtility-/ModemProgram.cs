@@ -243,13 +243,39 @@ namespace DelsysSigNIalGen
             //int calls = ModemProgram.secretCarrierFrequency / 1000;
             int calls = 1;  // init calls to 0 so we begin at the 0th packet
 
+            int delta_calls = 2;
+
+            if(calls == 1)
+            {
+                string directoryPath = @"C:\Users\engtest\Documents\CSV Dump";
+
+                // Delete all files
+                foreach (string file in Directory.GetFiles(directoryPath))
+                {
+                    File.Delete(file);
+                }
+
+                // Delete all subdirectories and their contents
+                foreach (string dir in Directory.GetDirectories(directoryPath))
+                {
+                    Directory.Delete(dir, true); // true allows deleting non-empty directories
+                }
+
+                //Console.WriteLine("All files and folders have been deleted.");
+            }
 
             while (!cts.Token.IsCancellationRequested)  // Check for cancellation request
             {
                 //Thread.Sleep(200); // for debugging non-real time, should pause a bit
                 (int hr, int spo2, int time_stamp) = getNextVals(calls);
+                if(hr==-1 && spo2 == -1 && time_stamp == -1) //file doesn't exist timeout occurred
+                {
+                    Trace.WriteLine("File does not exist.");
+                    calls += delta_calls;
+                    continue;
+                }
                 RunModemProgram(hr, spo2, time_stamp, stream, pcmStream, calls, waveBuff, ModemProgram.secretCarrierFrequency, ModemProgram.voltageAmplitude);
-                calls++;
+                calls += delta_calls; //every other packet for demo latency reduction
 
 
                 // There are currently csvs for 0-1000 values. Reset after reaching the end.
@@ -283,8 +309,8 @@ namespace DelsysSigNIalGen
                 RunModemProgram(hr, spo2, time_stamp, stream, pcmStream, calls, waveBuff, ModemProgram.secretCarrierFrequency, ModemProgram.voltageAmplitude);
                 (int hr2, int spo22, int time_stamp2) = getNextVals(calls2);
                 RunModemProgram(hr2, spo22, time_stamp2, stream, pcmStream, calls, waveBuff2, ModemProgram.secretCarrierFrequency2, ModemProgram.voltageAmplitude2);
-                calls++;
-                calls2++;
+                calls += 2;
+                calls2 += 2;
                 
 
                 // There are currently csvs for 0-1000 values. Reset after reaching the end.
@@ -306,60 +332,126 @@ namespace DelsysSigNIalGen
             int time_stamp = 0;
             // Change this path for your personal computer
             //string filePath = ($"C:\\Users\\TJoe\\Documents\\test_vals_DEMO_250218\\vals_{calls}.csv");  // modified this path to be where new files get creates
-            string filePath = ($"U:\\Users Common\\Ashwin\\hydros csv dump\\vals_{calls}.csv");  // modified this path to be where new files get creates
-
-            while (true)
+            string filePath = ($"C:\\Users\\engtest\\Documents\\CSV Dump\\vals_{calls}.csv");  // modified this path to be where new files get creates
+            if(calls == 1)
             {
-                try
+                while (true)
                 {
-                    if (File.Exists(filePath))
+                    try
                     {
-                        // init var for lines read from csv file
-                        string[] lines;
-
-                        // build in loop to handle if file is open in another process (been created but yet not closed)
-                        while (true) 
+                        if (File.Exists(filePath))
                         {
-                            try
+                            // init var for lines read from csv file
+                            string[] lines;
+
+                            // build in loop to handle if file is open in another process (been created but yet not closed)
+                            while (true)
                             {
-                                lines = File.ReadAllLines(filePath);
-                                break;
-                            }
-                            catch (Exception ex) 
-                            {
-                                Console.WriteLine("Reached the file open but used by another process exception..."); 
+                                try
+                                {
+                                    lines = File.ReadAllLines(filePath);
+                                    break;
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine("Reached the file open but used by another process exception...");
+                                };
                             };
-                        };
-                       
-                        if (lines.Length > 0)
-                        {
-                            string[] values = lines[0].Split(',');
 
-                            if (values.Length == 3 && int.TryParse(values[0], out hr) && int.TryParse(values[1], out spo2) && int.TryParse(values[2], out time_stamp))
+                            if (lines.Length > 0)
                             {
-                                Trace.WriteLine($"Algorithm Vals: {hr}, {spo2} at timestamp {time_stamp}");
-                                return (hr, spo2, time_stamp);
+                                string[] values = lines[0].Split(',');
+
+                                if (values.Length == 3 && int.TryParse(values[0], out hr) && int.TryParse(values[1], out spo2) && int.TryParse(values[2], out time_stamp))
+                                {
+                                    Trace.WriteLine($"Algorithm Vals: {hr}, {spo2} at timestamp {time_stamp}");
+                                    return (hr, spo2, time_stamp);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("File format is incorrect.");
+                                }
                             }
                             else
                             {
-                                Console.WriteLine("File format is incorrect.");
+                                Console.WriteLine("File is empty.");
                             }
                         }
                         else
                         {
-                            Console.WriteLine("File is empty.");
+                            //Console.WriteLine("File does not exist.");
+                            //return (-1, -1, -1);
                         }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        //Console.WriteLine("File does not exist.");
+                        Console.WriteLine($"An error occurred: {ex.Message}");
                     }
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"An error occurred: {ex.Message}");
-                }
             }
+            else
+            {
+                //int loops = 5;
+                //int idx = 0;
+                int time_ms = Environment.TickCount;
+                int offset_ms = Environment.TickCount;
+                while ((time_ms-offset_ms) < 2000)  //timeout
+                {
+                    try
+                    {
+                        if (File.Exists(filePath))
+                        {
+                            // init var for lines read from csv file
+                            string[] lines;
+
+                            // build in loop to handle if file is open in another process (been created but yet not closed)
+                            while (true)
+                            {
+                                try
+                                {
+                                    lines = File.ReadAllLines(filePath);
+                                    break;
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine("Reached the file open but used by another process exception...");
+                                };
+                            };
+
+                            if (lines.Length > 0)
+                            {
+                                string[] values = lines[0].Split(',');
+
+                                if (values.Length == 3 && int.TryParse(values[0], out hr) && int.TryParse(values[1], out spo2) && int.TryParse(values[2], out time_stamp))
+                                {
+                                    Trace.WriteLine($"Algorithm Vals: {hr}, {spo2} at timestamp {time_stamp}");
+                                    return (hr, spo2, time_stamp);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("File format is incorrect.");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("File is empty.");
+                            }
+                        }
+                        else
+                        {
+                            //Console.WriteLine("File does not exist.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"An error occurred: {ex.Message}");
+                    }
+                    time_ms = Environment.TickCount;
+                }
+                return (-1, -1, -1);
+
+            }
+
         }
 
         // Send the data and get the encoded waveform
