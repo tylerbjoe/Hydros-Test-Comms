@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>C:\Software\Hydros\MA-Transmit\HYDROS_COMMS-x64\Receive\SignalGenUtility-\bin\Debug\net8.0-windows</OutDir>
+    <OutDir>C:\Software\Hydros\Hydros-Test-Comms\HYDROS_COMMS-x64\Receive\SignalGenUtility-\bin\Debug\net8.0-windows</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>C:\Software\HYDROS_COMMS-Andrew\Receive\SignalGenUtility-\bin\Debug\net8.0-windows</OutDir>
@@ -117,14 +117,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Software\Hydros\MA-Transmit\HYDROS_COMMS-x64\Receive\SignalGenUtility-\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Software\Hydros\Hydros-Test-Comms\HYDROS_COMMS-x64\Receive\SignalGenUtility-\include</AdditionalIncludeDirectories>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Software\Hydros\MA-Transmit\HYDROS_COMMS-x64\Receive\SignalGenUtility-\include</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Software\Hydros\Hydros-Test-Comms\HYDROS_COMMS-x64\Receive\SignalGenUtility-\include</AdditionalLibraryDirectories>
       <AdditionalDependencies>libfftw3-3.lib;libfftw3f-3.lib;libfftw3l-3.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

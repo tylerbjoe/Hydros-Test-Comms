@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DelsysAPI" Version="2.6.4.1038-Main" />
+    <PackageReference Include="DelsysAPI" Version="2.7.0.1239-dev" />
   </ItemGroup>
 
   <ItemGroup>
