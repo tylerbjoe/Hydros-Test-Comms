@@ -54,7 +54,7 @@ namespace DelsysSigNIalGen
             string response = Encoding.UTF8.GetString(responseData, 0, bytes);
             lock (consoleLock)
             {
-                //Trace.WriteLine($"Received: {response}"); // You can print these out for debugging
+                Trace.WriteLine($"Received: {response}"); // You can print these out for debugging
             }
         }
 
