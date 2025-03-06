@@ -50,13 +50,41 @@ namespace DelsysSigNIalGen
         {
             byte[] responseData = new byte[256];
 
-            int bytes = stream.Read(responseData, 0, responseData.Length); // Will wait here if there is nothing to receive
-            string response = Encoding.UTF8.GetString(responseData, 0, bytes);
-            lock (consoleLock)
+            try
             {
-                Trace.WriteLine($"Received: {response}"); // You can print these out for debugging
+                stream.ReadTimeout = 3000; // Set timeout to 3 seconds
+
+                int bytes = stream.Read(responseData, 0, responseData.Length);
+                if (bytes > 0)
+                {
+                    string response = Encoding.UTF8.GetString(responseData, 0, bytes);
+                    lock (consoleLock)
+                    {
+                        Trace.WriteLine($"Received: {response}");
+                    }
+                }
+            }
+            catch (IOException ex) when (ex.InnerException is SocketException socketEx && socketEx.SocketErrorCode == SocketError.TimedOut)
+            {
+                // Timeout occurred, no message received
+                lock (consoleLock)
+                {
+                    Trace.WriteLine("No message received within 3 seconds.");
+                }
             }
         }
+
+        //static void GetRecMessages(NetworkStream stream)
+        //{
+        //    byte[] responseData = new byte[256];
+
+        //    int bytes = stream.Read(responseData, 0, responseData.Length); // Will wait here if there is nothing to receive
+        //    string response = Encoding.UTF8.GetString(responseData, 0, bytes);
+        //    lock (consoleLock)
+        //    {
+        //        Trace.WriteLine($"Received: {response}"); // You can print these out for debugging
+        //    }
+        //}
 
         // Receive control messages from modem and return and Data that is extracted
         static List<int> GetRecMessagesDataDecode(NetworkStream stream)
@@ -161,7 +189,34 @@ namespace DelsysSigNIalGen
                 Arguments = "Unused Arguments"
             };
             string jsonString = JsonSerializer.Serialize(rxStart);
-            SendJsonCommand(jsonString, 2, stream);
+            SendJsonCommand(jsonString, 1, stream);
+        }
+
+        static void sendPrePreData(int hr, int spo2, int numRec, NetworkStream stream)
+        {
+            var data = new
+            {
+                CompactForty = true,//Command = "TransmitJSON",
+                Arguments = new
+                {
+                    Payload = new
+                    {
+                        Data = new int[] { 1, 2, 3, 4, 5 }//{ hr, spo2 }
+                    }
+                }
+            };
+            string jsonString = JsonSerializer.Serialize(data);
+            SendJsonCommand(jsonString, numRec, stream);
+        }
+        static void sendPreData(int hr, int spo2, int numRec, NetworkStream stream)
+        {
+            var data = new
+            {
+                Command = "SetValue",
+                Arguments = "StreamingTxLen 0 0"
+            };
+            string jsonString = JsonSerializer.Serialize(data);
+            SendJsonCommand(jsonString, numRec, stream);
         }
 
         // Construct and send proper TransmitJSON json string with hr and spo2 values
@@ -170,11 +225,12 @@ namespace DelsysSigNIalGen
             var data = new
             {
                 Command = "TransmitJSON",
+                CompactForty = true,//Command = "TransmitJSON",
                 Arguments = new
                 {
                     Payload = new
                     {
-                        Data = new int[] { hr, spo2 }
+                        Data = new int[] { 1, 2, 3, 4, 5 }//{ hr, spo2 }
                     }
                 }
             };
@@ -337,14 +393,16 @@ namespace DelsysSigNIalGen
         public static void RunModemProgram(int heart_rate, int spo2, NetworkStream stream, NetworkStream pcmStream, int calls, BlockingCollection<float[]> waveBuff, int scf, float voltAmp)
         {
             // Send TransmitJSON message and pump 5s zero waveform
+            //sendPrePreData(heart_rate, spo2, 0, stream);
+            sendPreData(heart_rate, spo2, 0, stream);
             sendData(heart_rate, spo2, 0, stream);
-            sendBytes(pcmStream);
+            //sendBytes(pcmStream);
 
             // Control messages
             GetRecMessages(stream);
             GetRecMessages(stream);
             GetRecMessages(stream);
-            GetRecMessages(stream);
+            //GetRecMessages(stream);
 
             byte[] responseData = new byte[5120];
             float[] resArray = new float[102400 * 5]; // will get exactly 5s in return
@@ -356,23 +414,45 @@ namespace DelsysSigNIalGen
             // Store encoded waveform (in float type) in resArray
             while (nbytesTot < 2_048_000)
             {
-                nbytes = pcmStream.Read(responseData, 0, responseData.Length);
-                nbytesTot += nbytes;
-
-                int floatCount = nbytes / 4;
-
-                // Convert bytes to floats
-                for (int i = 0; i < floatCount; i++)
+                if (pcmStream.DataAvailable) // Ensure data is there before reading
                 {
-                    // Convert 4 bytes to a float
-                    float value = BitConverter.ToSingle(responseData, i * 4);
-                    if (resI < resArray.Length)
+                    nbytes = pcmStream.Read(responseData, 0, responseData.Length);
+                    nbytesTot += nbytes;
+
+                    int floatCount = nbytes / 4;
+                    for (int i = 0; i < floatCount; i++)
                     {
-                        resArray[resI] = value;
+                        float value = BitConverter.ToSingle(responseData, i * 4);
+                        if (resI < resArray.Length)
+                        {
+                            resArray[resI] = value;
+                        }
+                        resI++;
                     }
-                    resI++;
+                }
+                else
+                {
+                    Trace.WriteLine("Waiting for PCM data...");
+                    Thread.Sleep(500); // give time for data to arrive
                 }
             }
+            //nbytes = pcmStream.Read(responseData, 0, responseData.Length);
+            //nbytesTot += nbytes;
+
+            //int floatCount = nbytes / 4;
+
+            //// Convert bytes to floats
+            //for (int i = 0; i < floatCount; i++)
+            //{
+            //    // Convert 4 bytes to a float
+            //    float value = BitConverter.ToSingle(responseData, i * 4);
+            //    if (resI < resArray.Length)
+            //    {
+            //        resArray[resI] = value;
+            //    }
+            //    resI++;
+            //}
+
 
             // Only keep the packet, not the extra padding
             float[] cutArray;

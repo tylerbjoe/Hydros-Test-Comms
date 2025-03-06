@@ -157,7 +157,7 @@ namespace DelsysSigNIalGen
                 Arguments = "Unused Arguments"
             };
             string jsonString = JsonSerializer.Serialize(rxStart);
-            SendJsonCommand(jsonString, 2, stream);
+            SendJsonCommand(jsonString, 1, stream);
         }
 
         // Construct and send proper TransmitJSON json string with hr and spo2 values
@@ -214,7 +214,7 @@ namespace DelsysSigNIalGen
             SetValue("PayloadMode", 0, 1, streamDec);
 
             // For debugging, send a csv to make sure modem connection works
-            sendCSV(streamDec, pcmStreamDec, 0);
+            //sendCSV(streamDec, pcmStreamDec, 0);
 
             return (streamDec, pcmStreamDec, clientDec, pcmClientDec);
         }
