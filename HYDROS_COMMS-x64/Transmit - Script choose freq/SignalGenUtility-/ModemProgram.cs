@@ -100,10 +100,10 @@ namespace DelsysSigNIalGen
             //}
 
             // Add to log
-            using (StreamWriter sw = new StreamWriter($"C:\\Users\\TJoe\\Documents\\1_8_pooltest\\txoutputLog_{trialNum}.txt", true)) // Saves incoming messages from modem to txt file
-            {
-                sw.WriteLine(response);
-            }
+            //using (StreamWriter sw = new StreamWriter($"C:\\Users\\TJoe\\Documents\\1_8_pooltest\\txoutputLog_{trialNum}.txt", true)) // Saves incoming messages from modem to txt file
+            //{
+            //    sw.WriteLine(response);
+            //}
 
             if (response.Contains("Data"))
             {
@@ -208,7 +208,7 @@ namespace DelsysSigNIalGen
             string jsonString = JsonSerializer.Serialize(data);
             SendJsonCommand(jsonString, numRec, stream);
         }
-        static void sendPreData(int hr, int spo2, int numRec, NetworkStream stream)
+        static void setTxLen(int numRec, NetworkStream stream)
         {
             var data = new
             {
@@ -282,7 +282,7 @@ namespace DelsysSigNIalGen
         // Sends 5 seconds of zeros at 102.4kHz frequency. Note: 4 bytes in a float
         static void sendBytes(NetworkStream pcmStream)
         {
-            byte[] emptyWav = new byte[2_048_000];
+            byte[] emptyWav = new byte[2_048_0000];// [2_048_000];
             pcmStream.Write(emptyWav, 0, emptyWav.Length);
         }
 
@@ -393,19 +393,18 @@ namespace DelsysSigNIalGen
         public static void RunModemProgram(int heart_rate, int spo2, NetworkStream stream, NetworkStream pcmStream, int calls, BlockingCollection<float[]> waveBuff, int scf, float voltAmp)
         {
             // Send TransmitJSON message and pump 5s zero waveform
-            //sendPrePreData(heart_rate, spo2, 0, stream);
-            sendPreData(heart_rate, spo2, 0, stream);
+            setTxLen( 0, stream);
             sendData(heart_rate, spo2, 0, stream);
-            //sendBytes(pcmStream);
+            sendBytes(pcmStream);
 
             // Control messages
             GetRecMessages(stream);
             GetRecMessages(stream);
-            GetRecMessages(stream);
+            //GetRecMessages(stream);
             //GetRecMessages(stream);
 
-            byte[] responseData = new byte[5120];
-            float[] resArray = new float[102400 * 5]; // will get exactly 5s in return
+            byte[] responseData = new byte[51200];//[5120];
+            float[] resArray = new float[1_024_000 * 5]; // will get exactly 5s in return
 
             int nbytes;
             int resI = 0;
