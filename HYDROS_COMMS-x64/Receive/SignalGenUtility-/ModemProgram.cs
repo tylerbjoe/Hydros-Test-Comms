@@ -157,7 +157,7 @@ namespace DelsysSigNIalGen
                 Arguments = "Unused Arguments"
             };
             string jsonString = JsonSerializer.Serialize(rxStart);
-            SendJsonCommand(jsonString, 2, stream);
+            SendJsonCommand(jsonString, 1, stream);
         }
 
         // Construct and send proper TransmitJSON json string with hr and spo2 values
@@ -209,12 +209,12 @@ namespace DelsysSigNIalGen
 
             // Send all initializing commands:
             startrx(streamDec);
-            double frequencyDec = 35000; // var
+            double frequencyDec = 100_000; // var
             SetValue("Carrier", frequencyDec, 1, streamDec);
             SetValue("PayloadMode", 0, 1, streamDec);
 
             // For debugging, send a csv to make sure modem connection works
-            sendCSV(streamDec, pcmStreamDec, 0);
+            //sendCSV(streamDec, pcmStreamDec, 0);
 
             return (streamDec, pcmStreamDec, clientDec, pcmClientDec);
         }
@@ -342,7 +342,7 @@ namespace DelsysSigNIalGen
         // Sends 5 seconds of zeros at 102.4kHz frequency. Note: 4 bytes in a float
         static void sendBytes(NetworkStream pcmStream)
         {
-            byte[] emptyWav = new byte[2_048_000];
+            byte[] emptyWav = new byte[2_048_0000];
             pcmStream.Write(emptyWav, 0, emptyWav.Length);
         }
 
@@ -416,62 +416,7 @@ namespace DelsysSigNIalGen
             return output;
         }
 
-        // Downsample sigin from fs_bef to fs_down. And downshift from fc_bef to fc_down
-        public static float[] DownsampleDownshift(double[] sigin, int calls)
-        {
-            //SAVE INPUT
-            //SaveArrayToCsv("C:/Users/TJoe/Documents/1_8_pooltest/rx.csv", sigin);
-            float fs_down = 102_400; // changed 102_400
-            float fc_down = 35_000;
-            float fs_bef = 1_000_000;
-            float fc_bef = (float)secretCarrierFrequency;
-
-            // Undo modulate to passband  sigin = s(t) at HYDROS passband
-            int sigLen = sigin.Length;
-            Complex[] sigComplex = new Complex[sigLen];
-            for (int i = 0; i < sigLen; i++)
-            {
-                double pb_factor = -2 * Math.PI * fc_bef * (i + 1) / fs_bef; // +1 to match Python's 1-based indexing in arange
-                sigComplex[i] = new Complex(sigin[i], 0) * Complex.Exp(new Complex(0, pb_factor));
-            }
-
-            int resLen = (int)Math.Round(sigin.Length * 102_400.0 / 1_000_000.0);
-            var resampled = ResComp(sigComplex, resLen); // 512000
-            // SAVE DOWNSHIFT REAL COMPONENTS
-            //double[] realComponents = new double[resampled.Length];
-            //for (int i = 0; i < resampled.Length; i++)
-            //{
-            //    realComponents[i] = resampled[i].Real;
-            //}
-            //SaveArrayToCsv("C:/Users/TJoe/Documents/1_8_pooltest/rxds.csv", realComponents);
-
-            // Undo modulate to baseband (go back to Popoto passband)
-            int resampledLen = resampled.Length;
-            Complex[] no_bb = new Complex[resampledLen];
-            for (int i = 0; i < resampledLen; i++)
-            {
-                double bb_factor = 2 * Math.PI * fc_down * (i + 1) / fs_down; // +1 to match np.arange start @ 1
-                no_bb[i] = resampled[i] * Complex.Exp(new Complex(0, bb_factor));
-            }
-            // SAVE downsampled REAL COMPONENTS
-            //double[] realComponentss = new double[no_bb.Length];
-            //for (int i = 0; i < no_bb.Length; i++)
-            //{
-            //    realComponentss[i] = no_bb[i].Real;
-            //}
-            //SaveArrayToCsv("C:/Users/TJoe/Documents/1_8_pooltest/rxdsdsimag.csv", realComponentss);
-
-            // Subtract imag component from real component
-            float[] sigout = new float[no_bb.Length];
-            for (int i = 0; i < no_bb.Length; i++)
-            {
-                sigout[i] = (float)(no_bb[i].Real - no_bb[i].Imaginary);
-            }
-            // SAVE DOWNSHIFT
-            //SaveArrayToCsv("C:/Users/TJoe/Documents/1_8_pooltest/rxdsds.csv", sigout);
-
-            return sigout; // s(t) in popoto passband
-        }
+        
 
         private static void SaveArrayToCsv(string csvPath, double[] cutArray)
         {

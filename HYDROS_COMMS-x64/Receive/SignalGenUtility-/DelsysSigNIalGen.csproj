@@ -51,7 +51,6 @@
 
   <ItemGroup>
     <ProjectReference Include="Sub-Repos\DelsysNICommon\DelsysNICommon\DelsysNICommon.csproj" />
-    <ProjectReference Include="Sub-Repos\FFTProj\FFTProj.vcxproj" />
     <ProjectReference Include="Sub-Repos\Test-DelsysTestFramework\DelsysTestFramework.csproj" />
   </ItemGroup>
 

@@ -327,6 +327,8 @@ public sealed class NIDAQController
 
         aiTask.AIChannels.CreateVoltageChannel(channels, "", AITerminalConfiguration.Rse, -10, 10, AIVoltageUnits.Volts);
 
+        aiTask.Stream.ConfigureInputBuffer(1_000_000); // 1M sample buffer
+
         aiTask.Control(TaskAction.Verify);
         aiTask.Control(TaskAction.Commit);
         aiTask.Control(TaskAction.Unreserve);
@@ -365,7 +367,7 @@ public sealed class NIDAQController
     {
         int duration = samples / SampleRate;
         Task analogReadTask = CreateAITask(pinName);
-        analogReadTask.Timing.ConfigureSampleClock("", SampleRate, SampleClockActiveEdge.Rising, SampleQuantityMode.ContinuousSamples);
+        analogReadTask.Timing.ConfigureSampleClock("", 1_000_000, SampleClockActiveEdge.Rising, SampleQuantityMode.ContinuousSamples);
         AnalogSingleChannelReader reader = new AnalogSingleChannelReader(analogReadTask.Stream);
 
         Stopwatch s = Stopwatch.StartNew();
@@ -396,7 +398,7 @@ public sealed class NIDAQController
     {
         Task analogReadTask = CreateAITask(pinNames);
         AnalogMultiChannelReader reader = new AnalogMultiChannelReader(analogReadTask.Stream);
-        analogReadTask.Timing.ConfigureSampleClock("", rate, SampleClockActiveEdge.Rising, SampleQuantityMode.FiniteSamples);
+        analogReadTask.Timing.ConfigureSampleClock("", rate, SampleClockActiveEdge.Rising, SampleQuantityMode.ContinuousSamples);
 
         //reader.ReadWaveform(samplesPerChannel);
         double[,] data = reader.ReadMultiSample(samplesPerChannel);
@@ -425,7 +427,7 @@ public sealed class NIDAQController
         
         try
         {
-            analogReadTask.Timing.ConfigureSampleClock("", sampleRate, SampleClockActiveEdge.Rising, SampleQuantityMode.ContinuousSamples, samplesPerChannel * 2);
+            analogReadTask.Timing.ConfigureSampleClock("", 1_000_000, SampleClockActiveEdge.Rising, SampleQuantityMode.ContinuousSamples, samplesPerChannel * 2);
             analogReadTask.Control(TaskAction.Verify);
 
             analogReader = new AnalogMultiChannelReader(analogReadTask.Stream);

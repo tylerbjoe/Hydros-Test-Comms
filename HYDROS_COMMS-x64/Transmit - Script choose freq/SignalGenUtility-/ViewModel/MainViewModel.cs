@@ -493,10 +493,10 @@ partial class MainViewModel : ObservableObject
     [RelayCommand]
     public void PlayData() // Send packets
     {
-        ModemProgram.numTransducers = 2; // number of transducers
+        ModemProgram.numTransducers = 1; // number of transducers
         ModemProgram.sine = 0; // set 0 to not tranmit sine, set 1 to transmit only t1 sine, set 2 to transmit only t2 sine, set 3 to transmit both sine
 
-        ModemProgram.numPackets = 10; // number of packets to send
+        ModemProgram.numPackets = 50; // number of packets to send
         ModemProgram.secretCarrierFrequency = 100000; // Carrier Frequency;
         ModemProgram.secretCarrierFrequency2 = 101000; // Carrier Frequency;
 

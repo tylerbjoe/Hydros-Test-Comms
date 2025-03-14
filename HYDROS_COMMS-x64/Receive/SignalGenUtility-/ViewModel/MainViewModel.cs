@@ -620,7 +620,12 @@ partial class MainViewModel : ObservableObject
 
             if (takenData != null)
             {
-                float[] dfDowned = ModemProgram.DownsampleDownshift(takenData, calls);
+                float[] dfDowned = new float[takenData.Length];
+
+                for (int i = 0; i < takenData.Length; i++)
+                {
+                    dfDowned[i] = (float)takenData[i];  // Casting each element to float
+                }
 
                 // Decode the downsampled waveform data
                 ModemProgram.decodeMyWav(pcmStreamDec, dfDowned);

@@ -182,8 +182,8 @@ namespace DelsysTestFramework.NIDAQ
         
         public void Producer()
         {
-            //String mode = "DAQ";
-            String mode = "File";
+            String mode = "DAQ";
+            //String mode = "File";
             double[] yValues = Array.Empty<double>(); ;
             if (mode == "File")
             {
