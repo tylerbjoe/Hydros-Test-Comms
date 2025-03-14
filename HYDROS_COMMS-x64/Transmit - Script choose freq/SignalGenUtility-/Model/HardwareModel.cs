@@ -150,7 +150,8 @@ public sealed partial class HardwareModel : ObservableObject
         else if (_ff.GetNIConnected().Length == 1)
         {
             var nicards = _ff.GetNIConnected();
-            _ff.InitNICard(nicards.First());
+            //_ff.InitNICard(nicards.First());
+            _ff.InitNICard("Dev1");
         }
         if (_ff.MODEL == null)
         {
